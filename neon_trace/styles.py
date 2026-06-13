@@ -1803,8 +1803,8 @@ button.terminal-action {
 
 .kernel95-desktop {
   position: relative;
-  height: clamp(1015px, 96vh, 1220px);
-  min-height: 1015px;
+  height: clamp(1070px, 97vh, 1280px);
+  min-height: 1070px;
   overflow: hidden;
   border: 2px solid #050807;
   border-radius: 24px / 17px;
@@ -1822,7 +1822,7 @@ button.terminal-action {
 
 .k95-workspace {
   position: absolute;
-  inset: 0 0 474px;
+  inset: 0 0 524px;
   overflow: hidden;
   background:
     radial-gradient(circle at 72% 36%, rgba(255, 255, 255, 0.035), transparent 30%),
@@ -2784,7 +2784,7 @@ button.terminal-action {
   bottom: 58px;
   left: 12px;
   display: grid;
-  height: 410px;
+  height: 460px;
   grid-template-rows: auto minmax(0, 1fr) auto;
   overflow: hidden;
   border: 1px solid rgba(255, 111, 199, 0.58);
@@ -2867,7 +2867,7 @@ button.terminal-action {
   display: block;
   color: #ff58b9;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 720;
   letter-spacing: -0.01em;
   line-height: 1.25;
@@ -2967,25 +2967,25 @@ button.terminal-action {
 
 .k95-terminal-dock .mirror-terminal-entry > b {
   padding-right: 76px;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .k95-terminal-dock .mirror-terminal-entry > span {
   top: 8px;
   right: 11px;
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .k95-terminal-dock .mirror-terminal-entry pre {
   margin-top: 6px;
   color: #ffd1eb;
-  font-size: 15px;
-  line-height: 1.58;
+  font-size: 16px;
+  line-height: 1.62;
 }
 
 .k95-terminal-dock .mirror-terminal-cursor {
   padding: 8px 12px;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .k95-terminal-dock .mirror-terminal-cursor i {
@@ -3015,13 +3015,13 @@ button.terminal-action {
 
 .k95-testimony-guide b {
   color: #55f5ff;
-  font: 900 10px/1.2 "JetBrains Mono", "Lucida Console", monospace;
+  font: 900 11px/1.2 "JetBrains Mono", "Lucida Console", monospace;
   letter-spacing: 0.09em;
 }
 
 .k95-testimony-guide span {
   color: #d7b6ca;
-  font: 700 8px/1.3 "JetBrains Mono", "Lucida Console", monospace;
+  font: 700 9px/1.3 "JetBrains Mono", "Lucida Console", monospace;
 }
 
 .k95-terminal-actions button,
@@ -3033,7 +3033,7 @@ button.terminal-action {
   border-radius: 8px !important;
   background: linear-gradient(180deg, rgba(76, 27, 67, 0.68), rgba(34, 10, 29, 0.74)) !important;
   color: #ff9ed7 !important;
-  font: 800 11px/1.25 "JetBrains Mono", "Lucida Console", monospace !important;
+  font: 800 12px/1.25 "JetBrains Mono", "Lucida Console", monospace !important;
   letter-spacing: 0.04em;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.07),
@@ -3085,7 +3085,7 @@ button.terminal-action {
 
 .k95-terminal-command > span {
   color: #55f5ff;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 800;
 }
 
@@ -3100,7 +3100,7 @@ button.terminal-action {
   background: rgba(0, 0, 0, 0.48);
   color: #ffc9e9;
   caret-color: #55f5ff;
-  font: 15px/1.4 "JetBrains Mono", "Lucida Console", monospace;
+  font: 16px/1.4 "JetBrains Mono", "Lucida Console", monospace;
 }
 
 .k95-terminal-command input:focus {
@@ -3275,7 +3275,8 @@ button.terminal-action {
 
 .k95-ending-decision,
 .k95-ending-screen section,
-.k95-ending-screen blockquote {
+.k95-ending-screen blockquote,
+.k95-ending-mirror {
   margin: 12px 0;
   padding: 13px 15px;
   border-left: 4px solid #ff58b9;
@@ -3299,6 +3300,18 @@ button.terminal-action {
 .k95-ending-screen blockquote {
   border-color: #fff;
   background: rgba(255, 45, 166, 0.08);
+}
+
+.k95-ending-mirror {
+  border-left-color: #ff58b9;
+  background:
+    linear-gradient(90deg, rgba(255, 45, 166, 0.14), transparent),
+    rgba(255, 255, 255, 0.04);
+}
+
+.k95-ending-mirror p {
+  margin-bottom: 0;
+  color: #ffd3ec !important;
 }
 
 .k95-ending-screen details {
@@ -4074,8 +4087,8 @@ button.terminal-action {
   }
 
   .kernel95-desktop {
-    height: 1000px;
-    min-height: 1000px;
+    height: 1050px;
+    min-height: 1050px;
   }
 
   .k95-main-window {
@@ -4207,7 +4220,7 @@ button.terminal-action {
   }
 
   .k95-terminal-dock {
-    height: 420px;
+    height: 470px;
   }
 
   .k95-terminal-dock > header {

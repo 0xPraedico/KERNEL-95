@@ -71,11 +71,15 @@ def submit_judgment_event(payload: str, state: GameState) -> tuple[GameState, st
         f"13-MINUTE LOSS: {str(data.get('cause', '')).strip()}"
     )
     result = submit_final_judgment(decision, evidence, explanation, state)
-    state.current_mirror_message = result.narration
+    state.current_mirror_message = result.mirror_reaction
     state.selected_os_object = "final_judgment"
+    state.active_document_id = None
     state.terminal_history.append(
         f"FINAL JUDGMENT // {result.decision}\n{result.title} // "
         f"{result.narration}\nCONSEQUENCE: {result.consequence}"
+    )
+    state.terminal_history.append(
+        f"MIRROR\nLAST TRANSMISSION // {result.mirror_reaction}"
     )
     state.terminal_history = state.terminal_history[-16:]
     return _snapshot(state)

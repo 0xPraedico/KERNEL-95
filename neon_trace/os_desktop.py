@@ -347,6 +347,8 @@ def _desktop_window(state: GameState) -> str:
                 f"<p>{html.escape(state.ending_consequence)}</p></section>"
                 '<blockquote><small>EPILOGUE // 03:13</small>'
                 f"<p>{html.escape(state.ending_epilogue)}</p></blockquote>"
+                '<div class="k95-ending-mirror"><small>MIRROR // LAST TRANSMISSION</small>'
+                f"<p>{html.escape(state.ending_mirror_reaction)}</p></div>"
                 f'<details><summary>FORENSIC SCORE BREAKDOWN</summary><ul>{breakdown}</ul></details>'
                 '<div class="k95-ending-footer">KERNEL-95 RECOVERY DIVISION // CASE CLOSED</div>'
                 "</div>"
@@ -767,6 +769,14 @@ def render_os_desktop(state: GameState) -> str:
   }});
 
   const terminalInput = root.querySelector(".k95-terminal-input");
+  const terminalOutput = root.querySelector(".mirror-terminal-output");
+  const scrollTerminalToLatest = () => {{
+    if (!terminalOutput) return;
+    window.requestAnimationFrame(() => {{
+      terminalOutput.scrollTop = terminalOutput.scrollHeight;
+    }});
+  }};
+  scrollTerminalToLatest();
   const sendTerminal = () => {{
     const value = terminalInput ? terminalInput.value.trim() : "";
     if (!value) return;
@@ -1054,6 +1064,7 @@ def render_os_desktop(state: GameState) -> str:
     const showTerminal = () => {{
       terminal.classList.remove("terminal-hidden");
       terminalTask?.classList.add("active");
+      scrollTerminalToLatest();
     }};
     terminalTask?.classList.add("active");
     terminalTask?.addEventListener("click", () => {{
@@ -1075,6 +1086,7 @@ def render_os_desktop(state: GameState) -> str:
       terminal.dataset.x = "0";
       terminal.dataset.y = "0";
       saveTerminal();
+      scrollTerminalToLatest();
     }});
     const handle = terminal.querySelector("header");
     let moving = false, startX = 0, startY = 0, originX = 0, originY = 0;
@@ -1253,6 +1265,7 @@ def render_judgment(result: JudgmentResult | None) -> str:
   <p>{html.escape(result.narration)}</p>
   <p><b>CONSEQUENCE:</b> {html.escape(result.consequence)}</p>
   <blockquote>{html.escape(result.epilogue)}</blockquote>
+  <p><b>MIRROR:</b> {html.escape(result.mirror_reaction)}</p>
   <table>{rows}<tr><th>TOTAL</th><th>{result.score}</th></tr></table>
 </div>
 """

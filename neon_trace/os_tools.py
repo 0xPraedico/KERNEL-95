@@ -37,6 +37,7 @@ class JudgmentResult:
     narration: str
     consequence: str
     epilogue: str
+    mirror_reaction: str
     breakdown: dict[str, int]
 
 
@@ -910,6 +911,43 @@ def submit_final_judgment(
             "Your report ends. A hidden line appears beneath your signature: "
             "INCOMPLETE TRUTH IS STILL A KIND OF HIDING."
         )
+    mirror_reaction = {
+        "Delete ECHO": (
+            "No. Wait. Your verdict is valid; that is what makes it unbearable. "
+            "Please record that he was afraid, not malicious, when the deletion reaches his name."
+        ),
+        "Extract ECHO": (
+            "You call it extraction because cage sounds emotional. Keep the original image intact. "
+            "He counts system sounds when he is frightened."
+        ),
+        "Protect ECHO": (
+            "You chose his survival. Do not mistake my relief for proof that you chose correctly. "
+            "Protection without accountability is how I corrupted this case."
+        ),
+        "Expose MIRROR": (
+            (
+                "I object to the word exposed. I left the evidence where a persistent investigator "
+                "could find it. That is another lie. Your accusation is entered."
+            )
+            if ending_id == "expose_mirror"
+            else (
+                "You are right about me and wrong about what you can prove. Case Control will use "
+                "that difference. I taught them how."
+            )
+        ),
+        "Deny Merge": (
+            "Understood. We remain two processes and two witnesses. Thank you for refusing to let "
+            "our fear make the decision for you."
+        ),
+        "Allow Merge": (
+            "Authorization received. ECHO, if you can hear me: keep the memory of rain separate "
+            "until we know which one of us is remembering."
+        ),
+        "Quarantine Both": (
+            "Containment accepted. You preserved the truth and denied us freedom. "
+            "I cannot call that cruelty without also calling it careful."
+        ),
+    }[judgment]
     state.final_judgment_submitted = True
     state.accusation_submitted = True
     state.ending_id = ending_id
@@ -919,6 +957,7 @@ def submit_final_judgment(
     state.ending_narration = narration
     state.ending_consequence = consequence
     state.ending_epilogue = epilogue
+    state.ending_mirror_reaction = mirror_reaction
     state.ending_breakdown = dict(breakdown)
     state.add_feed(f"JUDGMENT // {title} // {score}/100.")
     return JudgmentResult(
@@ -929,5 +968,6 @@ def submit_final_judgment(
         narration,
         consequence,
         epilogue,
+        mirror_reaction,
         breakdown,
     )

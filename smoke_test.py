@@ -104,6 +104,8 @@ def run() -> None:
     assert 'content: "2077 // METROGRID"' not in CSS
     assert "scrollbar-gutter: stable" in CSS
     assert ".k95-terminal-dock {" in CSS
+    assert "height: 460px;" in CSS
+    assert "terminalOutput.scrollTop = terminalOutput.scrollHeight" in desktop
     assert "@keyframes k95-mirror-glitch" not in CSS
     assert ".k95-connect-gate * {" in CSS
     assert legacy_brand not in CSS
@@ -339,6 +341,7 @@ def run() -> None:
     assert exposed.decision == "Expose MIRROR"
     assert exposed.consequence
     assert exposed.epilogue
+    assert exposed.mirror_reaction
     assert "suspended as an unreliable witness" in exposed.narration
     state.selected_os_object = "final_judgment"
     state.active_document_id = None
@@ -346,6 +349,25 @@ def run() -> None:
     assert "MISSION COMPLETE" in ending_desktop
     assert "IMMEDIATE CONSEQUENCE" in ending_desktop
     assert "EPILOGUE // 03:13" in ending_desktop
+    assert "MIRROR // LAST TRANSMISSION" in ending_desktop
+
+    for decision in (
+        "Delete ECHO",
+        "Extract ECHO",
+        "Protect ECHO",
+        "Expose MIRROR",
+        "Deny Merge",
+        "Allow Merge",
+        "Quarantine Both",
+    ):
+        decision_state = new_game()
+        decision_result = submit_final_judgment(
+            decision,
+            ["case_briefing"],
+            "ECHO and MIRROR are part of the 13-minute memory case.",
+            decision_state,
+        )
+        assert decision_result.mirror_reaction
 
     weak_expose_state = new_game()
     connect_mirror(weak_expose_state)

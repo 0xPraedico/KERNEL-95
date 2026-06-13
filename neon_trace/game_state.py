@@ -125,6 +125,7 @@ class GameState:
     ending_narration: str = ""
     ending_consequence: str = ""
     ending_epilogue: str = ""
+    ending_mirror_reaction: str = ""
     ending_breakdown: dict[str, int] = field(default_factory=dict)
     mirror_claim_verified: bool = False
     restore_points_compared: bool = False
