@@ -1,4 +1,4 @@
-"""NEON TRACE: The Last Desktop, a retro OS forensic horror game."""
+"""KERNEL-95: The Last Desktop, a retro OS forensic horror game."""
 
 from __future__ import annotations
 
@@ -15,12 +15,7 @@ from neon_trace.os_data import JUDGMENT_OPTIONS
 from neon_trace.os_desktop import OS_DESKTOP_BOOTSTRAP, render_os_desktop
 from neon_trace.os_tools import submit_final_judgment
 from neon_trace.styles import CSS
-from neon_trace.world_cup import (
-    get_matches,
-    prediction_is_open,
-    save_predictions,
-    user_predictions,
-)
+from neon_trace.world_cup import get_matches
 
 load_dotenv()
 gr.set_static_paths(paths=[Path(__file__).parent / "assets"])
@@ -36,8 +31,13 @@ def _snapshot(state: GameState) -> tuple[GameState, str, dict]:
 
 def open_desktop_event(event: str, state: GameState) -> tuple[GameState, str, dict]:
     """Handle every icon, file, action, and reboot event from inside the CRT."""
-    if (event or "").strip() == "reset_case":
+    event = (event or "").strip()
+    if event == "reset_case":
         return _snapshot(new_game())
+    if event == "refresh_world_cup":
+        get_matches(force=True)
+        state.selected_os_object = "world_cup_2026"
+        return _snapshot(state)
     result = handle_os_event(event, state)
     _apply_message(state, result.message)
     return _snapshot(state)
@@ -80,83 +80,12 @@ def submit_judgment_event(payload: str, state: GameState) -> tuple[GameState, st
     return _snapshot(state)
 
 
-def handle_world_cup_event(
-    payload: str,
-    state: GameState,
-    profile: gr.OAuthProfile | None,
-) -> tuple[GameState, str, dict]:
-    """Restore or save World Cup picks, with HF identity when available."""
-    try:
-        data = json.loads(payload or "{}")
-    except json.JSONDecodeError:
-        data = {}
-    matches, source_error = get_matches()
-    by_id = {str(match["id"]): match for match in matches}
-    incoming = data.get("predictions", {})
-    if not isinstance(incoming, dict):
-        incoming = {}
-    for match_id, choice in incoming.items():
-        match_id = str(match_id)
-        choice = str(choice)
-        match = by_id.get(match_id)
-        if (
-            match
-            and choice in {"home", "draw", "away"}
-            and prediction_is_open(match)
-        ):
-            state.world_cup_predictions[match_id] = choice
-
-    state.leaderboard_unlocked = bool(state.world_cup_predictions)
-    state.selected_os_object = "world_cup_2026"
-    if profile is not None:
-        state.hf_username = profile.username
-
-    if data.get("type") == "save":
-        if not state.world_cup_predictions:
-            state.world_cup_status = "Choose at least one open match before saving."
-        elif profile is None:
-            state.world_cup_save_prompt = True
-            state.world_cup_status = (
-                "Picks staged locally. Connect Hugging Face to join the secret board."
-            )
-        else:
-            synced, message = save_predictions(
-                profile.username,
-                profile.name,
-                state.world_cup_predictions,
-            )
-            state.world_cup_save_prompt = not synced
-            state.world_cup_status = message
-    elif source_error:
-        state.world_cup_status = source_error
-    return _snapshot(state)
-
-
-def load_user_session(
-    state: GameState,
-    profile: gr.OAuthProfile | None,
-) -> tuple[GameState, str]:
-    """Restore the HF display identity after an OAuth redirect."""
-    if profile is not None:
-        state.hf_username = profile.username
-        restored = user_predictions(profile.username)
-        if restored:
-            state.world_cup_predictions.update(restored)
-            state.leaderboard_unlocked = True
-    return state, render_os_desktop(state)
-
-
 def build_app() -> gr.Blocks:
     initial = new_game()
-    oauth_enabled = bool(
-        os.getenv("SPACE_ID")
-        or os.getenv("OAUTH_CLIENT_ID")
-        or os.getenv("HF_TOKEN")
-    )
     with gr.Blocks(
         css=CSS,
         js=OS_DESKTOP_BOOTSTRAP,
-        title="NEON TRACE: The Last Desktop",
+        title="KERNEL-95: The Last Desktop",
     ) as demo:
         state = gr.State(initial)
         desktop_output = gr.HTML(
@@ -185,27 +114,6 @@ def build_app() -> gr.Blocks:
             elem_id="judgment_event_bridge",
             elem_classes=["os-object-bridge"],
         )
-        worldcup_event_bridge = gr.Textbox(
-            value="",
-            show_label=False,
-            container=False,
-            elem_id="worldcup_event_bridge",
-            elem_classes=["os-object-bridge"],
-        )
-        if oauth_enabled:
-            gr.LoginButton(
-                value="Sign in with Hugging Face 🤗",
-                logout_value="Disconnect Hugging Face ({})",
-                elem_id="hf_login_button",
-                elem_classes=["os-object-bridge"],
-            )
-        else:
-            gr.Button(
-                "HF OAuth is enabled after deployment to Spaces",
-                elem_id="hf_login_button",
-                elem_classes=["os-object-bridge"],
-            )
-
         os_event_bridge.input(
             open_desktop_event,
             inputs=[os_event_bridge, state],
@@ -221,28 +129,6 @@ def build_app() -> gr.Blocks:
             inputs=[judgment_event_bridge, state],
             outputs=[state, desktop_output, judgment_event_bridge],
         )
-        if oauth_enabled:
-            worldcup_event_bridge.input(
-                handle_world_cup_event,
-                inputs=[worldcup_event_bridge, state],
-                outputs=[state, desktop_output, worldcup_event_bridge],
-            )
-            demo.load(
-                load_user_session,
-                inputs=[state],
-                outputs=[state, desktop_output],
-                show_progress="hidden",
-            )
-        else:
-            worldcup_event_bridge.input(
-                lambda payload, current: handle_world_cup_event(
-                    payload,
-                    current,
-                    None,
-                ),
-                inputs=[worldcup_event_bridge, state],
-                outputs=[state, desktop_output, worldcup_event_bridge],
-            )
 
     return demo
 

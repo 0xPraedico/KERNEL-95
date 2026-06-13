@@ -226,12 +226,6 @@ OS_OBJECTS: dict[str, dict[str, object]] = {
         "description": "Live World Cup 2026 match predictions.",
         "window": "WORLD_CUP_2026",
     },
-    "secret_leaderboard": {
-        "type": "secret", "label": "HF Rankings", "icon": "HF",
-        "description": "The secret prediction leaderboard.",
-        "window": "HF_LEADERBOARD", "visible_condition": "leaderboard_unlocked",
-        "debug_easter_egg": True,
-    },
 }
 
 OS_OBJECT_CHOICES = [(str(item["label"]), object_id) for object_id, item in OS_OBJECTS.items()]

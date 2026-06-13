@@ -1,15 +1,15 @@
-"""End-to-end smoke test for NEON TRACE: The Last Desktop."""
+"""End-to-end smoke test for KERNEL-95: The Last Desktop."""
 
 from __future__ import annotations
 
 import os
+from datetime import datetime, timezone
 
 os.environ.pop("OPENAI_API_KEY", None)
-os.environ.pop("HF_TOKEN", None)
-os.environ.pop("HF_LEADERBOARD_REPO", None)
-os.environ.pop("NEON_TRACE_DEBUG_EASTER_EGGS", None)
+os.environ.pop("KERNEL95_DEBUG_EASTER_EGGS", None)
 
 import app
+import neon_trace.os_desktop as os_desktop
 from neon_trace.ai_engine import mirror_terminal_response
 from neon_trace.game_state import new_game
 from neon_trace.os_actions import (
@@ -65,6 +65,7 @@ def prepare_breach_state():
 
 
 def run() -> None:
+    legacy_brand = "NEON" + " TRACE"
     initial = new_game()
     assert initial.mirror_connected is False
     assert initial.game_phase == "landing"
@@ -81,7 +82,11 @@ def run() -> None:
     assert 'data-os-object="tetris_95"' not in desktop
     assert 'data-os-object="world_cup_2026"' in desktop
     assert 'data-os-object="claude_code"' in desktop
+    assert 'data-os-object="secret_leaderboard"' not in desktop
     assert "TETRIS.EXE" not in desktop
+    assert legacy_brand not in desktop
+    assert "worldcup_event_bridge" not in desktop
+    assert "hf_login_button" not in str(app.demo.config)
     assert "connect_mirror" in desktop
     assert "MutationObserver" in OS_DESKTOP_BOOTSTRAP
     assert os.path.exists("assets/mirror-connect-background.png")
@@ -91,7 +96,46 @@ def run() -> None:
     ) in CSS
     assert "@keyframes k95-mirror-glitch" not in CSS
     assert ".k95-connect-gate * {" in CSS
+    assert legacy_brand not in CSS
     assert os.path.exists("HOW_TO_PLAY.md")
+
+    original_get_matches = os_desktop.get_matches
+    os_desktop.get_matches = lambda: (
+        [
+            {
+                "id": "mock-1",
+                "home": "Home",
+                "away": "Away",
+                "home_flag": "",
+                "away_flag": "",
+                "kickoff": datetime(
+                    2099,
+                    6,
+                    13,
+                    18,
+                    0,
+                    tzinfo=timezone.utc,
+                ),
+                "group": "GROUP A",
+                "finished": False,
+                "live": False,
+                "result": None,
+            }
+        ],
+        "",
+    )
+    try:
+        world_cup = os_desktop._world_cup_window()
+    finally:
+        os_desktop.get_matches = original_get_matches
+    assert "LIVE FIXTURE FEED" in world_cup
+    assert "BROWSER-LOCAL PICKS" in world_cup
+    assert 'value="home"' in world_cup
+    assert 'value="draw"' in world_cup
+    assert 'value="away"' in world_cup
+    assert 'data-os-event="refresh_world_cup"' in world_cup
+    assert "Hugging Face" not in world_cup
+    assert "SAVE PICKS" not in world_cup
 
     locked = handle_terminal_input("dir", initial.selected_os_object, initial)
     assert locked.message == "Connect MIRROR.exe first."
@@ -225,7 +269,7 @@ def run() -> None:
     assert not any(term in rendered_active for term in FORBIDDEN_ACTIVE_LORE)
     assert "threejs" not in app.__dict__
     assert "OS Object (fallback)" not in str(app.demo.config)
-    print("NEON TRACE: The Last Desktop smoke test: PASS")
+    print("KERNEL-95: The Last Desktop smoke test: PASS")
     print(f"Components: {len(app.demo.blocks)}")
     print(f"Dependencies: {len(app.demo.config['dependencies'])}")
     print("Verified: connection, OS actions, trace, emotional UI, expose endings, fallback")

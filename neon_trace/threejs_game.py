@@ -14,21 +14,21 @@ THREEJS_GAME_BOOTSTRAP = r"""
   "use strict";
   const executeSceneScripts = () => {
     document.querySelectorAll(".sector7-game + script:not([data-neon-executed])").forEach((source) => {
-      source.dataset.neonExecuted = "true";
+      source.dataset.kernel95Executed = "true";
       const runtime = document.createElement("script");
-      runtime.dataset.neonTraceRuntime = "true";
+      runtime.dataset.kernel95Runtime = "true";
       runtime.textContent = source.textContent;
       document.body.appendChild(runtime);
       runtime.remove();
     });
   };
   executeSceneScripts();
-  if (window.NeonTrace3DBootstrap && window.NeonTrace3DBootstrap.observer) {
-    window.NeonTrace3DBootstrap.observer.disconnect();
+  if (window.Kernel95ThreeBootstrap && window.Kernel95ThreeBootstrap.observer) {
+    window.Kernel95ThreeBootstrap.observer.disconnect();
   }
   const observer = new MutationObserver(executeSceneScripts);
   observer.observe(document.body, { childList: true, subtree: true });
-  window.NeonTrace3DBootstrap = { observer, executeSceneScripts };
+  window.Kernel95ThreeBootstrap = { observer, executeSceneScripts };
 }
 """
 
@@ -64,7 +64,7 @@ def render_threejs_game(state: GameState, selected_object: str | None = None) ->
     selected = selected_object or state.selected_3d_object or "evidence_sector_log"
     if selected not in GAME_OBJECTS:
         selected = "evidence_sector_log"
-    render_id = f"neon-trace-3d-{uuid.uuid4().hex}"
+    render_id = f"kernel95-3d-{uuid.uuid4().hex}"
     scene_state = _minimal_state(state, selected)
     visible_objects = {
         object_id: item
@@ -113,8 +113,8 @@ def render_threejs_game(state: GameState, selected_object: str | None = None) ->
   const objectsData = {objects_json};
   const gameState = {state_json};
   const CDN = "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js";
-  window.NeonTrace3D = window.NeonTrace3D || {{ currentInstance: null, loading: null }};
-  const ns = window.NeonTrace3D;
+  window.Kernel95Three = window.Kernel95Three || {{ currentInstance: null, loading: null }};
+  const ns = window.Kernel95Three;
 
   function findBridge() {{
     const selectors = [

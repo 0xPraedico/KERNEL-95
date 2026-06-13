@@ -2091,12 +2091,6 @@ button.terminal-action {
   color: #000080;
 }
 
-.k95-icon[data-os-object="secret_leaderboard"] .k95-icon-art {
-  background: #ffd21f;
-  color: #151515;
-  font-size: 12px;
-}
-
 .k95-window {
   position: absolute;
   z-index: 10;
@@ -2506,7 +2500,7 @@ button.terminal-action {
   display: grid;
   height: 100%;
   min-height: 0;
-  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
   gap: 5px;
   color: #111 !important;
 }
@@ -2539,9 +2533,14 @@ button.terminal-action {
   color: #111 !important;
 }
 
+.k95-world-cup-links {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
 .k95-world-cup-toolbar a,
-.k95-save-predictions,
-.k95-hf-signin {
+.k95-world-cup-toolbar button {
   min-width: 0 !important;
   min-height: 34px !important;
   padding: 7px 11px !important;
@@ -2555,8 +2554,7 @@ button.terminal-action {
   transform: none !important;
 }
 
-.k95-save-predictions,
-.k95-hf-signin {
+.k95-world-cup-toolbar button {
   background: #000080 !important;
   color: #fff !important;
 }
@@ -2679,8 +2677,7 @@ button.terminal-action {
 }
 
 .k95-world-cup-alert,
-.k95-world-cup-status,
-.k95-hf-prompt {
+.k95-world-cup-status {
   padding: 7px 9px;
   border: 2px inset #eee;
   background: #ffffd9;
@@ -2693,68 +2690,9 @@ button.terminal-action {
   color: #700;
 }
 
-.k95-hf-prompt {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  justify-content: space-between;
-  background: #fff4b8;
-}
-
-.k95-hf-prompt b {
-  color: #000 !important;
-}
-
-.k95-hf-prompt p {
-  flex: 1;
-  margin: 0 !important;
-  color: #111 !important;
-  font-size: 12px !important;
-}
-
-.k95-hf-prompt.connected {
-  background: #d8ffd8;
-}
-
-.k95-leaderboard-window {
-  z-index: 35;
-  top: 12%;
-  left: 25%;
-  width: 56%;
-}
-
-.k95-leaderboard {
-  padding: 10px;
-  border: 2px inset #eee;
-  background: #fff;
-}
-
-.k95-secret-stamp {
-  padding: 9px;
-  border: 3px double #000080;
-  color: #000080;
-  font-size: 18px;
-  font-weight: 900;
-  text-align: center;
-}
-
-.k95-leaderboard table {
-  width: 100%;
-  margin: 10px 0;
-  border-collapse: collapse;
-}
-
-.k95-leaderboard th,
-.k95-leaderboard td {
-  padding: 7px;
-  border: 1px solid #7f7f7f;
-  color: #111;
-  text-align: left;
-}
-
-.k95-leaderboard th {
-  background: #000080;
-  color: #fff;
+.k95-world-cup-footer b {
+  color: #006000;
+  font-size: 11px;
 }
 
 .k95-bsod {
@@ -3954,11 +3892,6 @@ button.terminal-action {
     font-size: 11px;
   }
 
-  .k95-hf-prompt {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
   .k95-mirror-window {
     right: 3%;
     bottom: 8%;
@@ -4050,7 +3983,7 @@ button.terminal-action {
 HERO_HTML = """
 <div class="hero">
   <div class="eyebrow">KERNEL-95 Recovery Division // Case 013</div>
-  <h1>NEON TRACE</h1>
+  <h1>KERNEL-95</h1>
   <h2>The Last Desktop</h2>
   <p>A recovered computer, a hidden intelligence, and one unreliable witness.</p>
 </div>

@@ -14,7 +14,6 @@ from .os_tools import JudgmentResult
 from .world_cup import (
     FIFA_FIXTURES_URL,
     get_matches,
-    leaderboard_rows,
     prediction_is_open,
 )
 
@@ -76,7 +75,7 @@ def _mask_integrity(state: GameState) -> int:
 
 
 def _debug_easter_eggs_enabled() -> bool:
-    return os.getenv("NEON_TRACE_DEBUG_EASTER_EGGS", "") == "1"
+    return os.getenv("KERNEL95_DEBUG_EASTER_EGGS", "") == "1"
 
 
 def _window(title: str, body: str, css_class: str = "") -> str:
@@ -151,14 +150,13 @@ def _flag(url: str, country: str) -> str:
     )
 
 
-def _world_cup_window(state: GameState) -> str:
+def _world_cup_window() -> str:
     matches, error = get_matches()
     now = datetime.now(timezone.utc)
     remaining = [match for match in matches if not match["finished"]]
     rows = []
     for match in remaining:
         match_id = str(match["id"])
-        selected = state.world_cup_predictions.get(match_id, "")
         open_for_picks = prediction_is_open(match, now)
         disabled = "" if open_for_picks else " disabled"
         status = "LIVE // PICKS LOCKED" if match["live"] else "OPEN"
@@ -172,7 +170,7 @@ def _world_cup_window(state: GameState) -> str:
         choice_html = "".join(
             '<label>'
             f'<input type="radio" name="pick-{html.escape(match_id)}" '
-            f'value="{choice}"{" checked" if selected == choice else ""}{disabled}>'
+            f'value="{choice}"{disabled}>'
             f"<span>{html.escape(label)}</span></label>"
             for choice, label in choices
         )
@@ -194,39 +192,28 @@ def _world_cup_window(state: GameState) -> str:
 """
         )
     source_message = (
-        f'<div class="k95-world-cup-alert">{html.escape(error)}</div>' if error else ""
-    )
-    prompt = ""
-    if state.world_cup_save_prompt and not state.hf_username:
-        prompt = """
-<div class="k95-hf-prompt">
-  <b>READY TO MAKE IT OFFICIAL?</b>
-  <p>Sign in with Hugging Face 🤗 to secure your picks and enter the secret leaderboard.</p>
-  <button type="button" class="k95-hf-signin">SIGN IN WITH HUGGING FACE 🤗</button>
-</div>
-"""
-    elif state.hf_username:
-        prompt = (
-            '<div class="k95-hf-prompt connected"><b>HF LINK ACTIVE</b>'
-            f"<p>Connected as @{html.escape(state.hf_username)}. Saving updates "
-            "your secret leaderboard entry.</p></div>"
+        f'<div class="k95-world-cup-alert">{html.escape(error)}</div>'
+        if error
+        else (
+            '<div class="k95-world-cup-status">'
+            "LIVE FIXTURE FEED // BROWSER-LOCAL PICKS // NO ACCOUNT"
+            "</div>"
         )
-    status = (
-        f'<div class="k95-world-cup-status">{html.escape(state.world_cup_status)}</div>'
-        if state.world_cup_status
-        else ""
     )
     body = f"""
 <div class="k95-world-cup">
   <div class="k95-world-cup-toolbar">
     <div><b>WORLD CUP 2026 PREDICTOR</b><span>{len(remaining)} unfinished matches // regulation time only</span></div>
-    <a href="{FIFA_FIXTURES_URL}" target="_blank" rel="noopener noreferrer">FIFA FIXTURES</a>
+    <div class="k95-world-cup-links">
+      <button type="button" data-os-event="refresh_world_cup">REFRESH LIVE</button>
+      <a href="{FIFA_FIXTURES_URL}" target="_blank" rel="noopener noreferrer">FIFA FIXTURES</a>
+    </div>
   </div>
-  {source_message}{status}{prompt}
+  {source_message}
   <div class="k95-match-list">{"".join(rows) if rows else "<p>No unfinished matches found.</p>"}</div>
   <div class="k95-world-cup-footer">
     <span>Choose HOME, DRAW, or AWAY. Picks lock at kickoff.</span>
-    <button type="button" class="k95-save-predictions">SAVE PICKS</button>
+    <b data-local-pick-status>LOCAL PICKS READY</b>
   </div>
 </div>
 """
@@ -234,35 +221,6 @@ def _world_cup_window(state: GameState) -> str:
         "WORLD_CUP_2026.EXE",
         body,
         "k95-main-window k95-world-cup-window",
-    )
-
-
-def _leaderboard_window() -> str:
-    matches, error = get_matches()
-    rows, source = leaderboard_rows(matches)
-    table_rows = "".join(
-        "<tr>"
-        f"<td>{index}</td><td>@{html.escape(str(row['username']))}</td>"
-        f"<td>{row['score']}</td><td>{row['settled']}</td><td>{row['picks']}</td>"
-        "</tr>"
-        for index, row in enumerate(rows, 1)
-    )
-    body = f"""
-<div class="k95-leaderboard">
-  <div class="k95-secret-stamp">SECRET // 🤗 HF LINK</div>
-  <p>{html.escape(source)}</p>
-  {"<p>" + html.escape(error) + "</p>" if error else ""}
-  <table>
-    <thead><tr><th>#</th><th>PLAYER</th><th>PTS</th><th>FINAL</th><th>PICKS</th></tr></thead>
-    <tbody>{table_rows or '<tr><td colspan="5">No synchronized players yet.</td></tr>'}</tbody>
-  </table>
-  <small>One point for each correct outcome after 90 minutes. Extra time and penalties do not change a draw.</small>
-</div>
-"""
-    return _window(
-        "HF_RANKINGS.SECRET",
-        body,
-        "k95-main-window k95-leaderboard-window",
     )
 
 
@@ -275,9 +233,7 @@ def _desktop_window(state: GameState) -> str:
     if object_id == "tetris_95":
         return _tetris_window()
     if object_id == "world_cup_2026":
-        return _world_cup_window(state)
-    if object_id == "secret_leaderboard":
-        return _leaderboard_window()
+        return _world_cup_window()
     file_id = selected.get("file_id")
     if (
         object_id == "case_briefing_file"
@@ -638,19 +594,18 @@ def render_os_desktop(state: GameState) -> str:
   </div>
 </section>
 <div class="crt-chassis">
-  <div class="crt-brand"><b>NEON TRACE // THE LAST DESKTOP</b><span>CASE 013 // YEAR 2077</span></div>
+  <div class="crt-brand"><b>KERNEL-95 // THE LAST DESKTOP</b><span>CASE 013 // YEAR 2077</span></div>
   <div class="crt-bezel">
     <div id="{render_id}" class="kernel95-desktop"
       data-selected="{html.escape(state.selected_os_object)}"
       data-mirror-connected="{"true" if state.mirror_connected else "false"}"
-      data-mirror-state="{get_mirror_emotional_state(state)}"
-      data-prediction-count="{len(state.world_cup_predictions)}">
+      data-mirror-state="{get_mirror_emotional_state(state)}">
       <div class="k95-workspace">
         <div class="k95-mirror-wallpaper state-{get_mirror_emotional_state(state)}" aria-hidden="true">
           <i class="k95-mirror-mask"><b></b><b></b></i>
           <span>MIRROR // {get_mirror_emotional_state(state).replace("_", "-").upper()}</span>
         </div>
-        <div class="k95-wallpaper-mark">NEON TRACE<small>THE LAST DESKTOP</small></div>
+        <div class="k95-wallpaper-mark">KERNEL-95<small>THE LAST DESKTOP</small></div>
         <div class="k95-icons">{"".join(icons)}</div>
         {boot_window}
         {_desktop_window(state)}
@@ -771,7 +726,7 @@ def render_os_desktop(state: GameState) -> str:
     else updateClock();
   }}, 1000);
 
-  const predictionKey = "neon_trace_wc_predictions";
+  const predictionKey = "kernel95_wc_predictions";
   const readLocalPredictions = () => {{
     try {{
       return JSON.parse(window.localStorage.getItem(predictionKey) || "{{}}");
@@ -786,6 +741,10 @@ def render_os_desktop(state: GameState) -> str:
       if (selected) picks[match.dataset.matchId] = selected.value;
     }});
     window.localStorage.setItem(predictionKey, JSON.stringify(picks));
+    const status = root.querySelector("[data-local-pick-status]");
+    if (status) status.textContent = Object.keys(picks).length
+      ? `${{Object.keys(picks).length}} PICKS SAVED LOCALLY`
+      : "LOCAL PICKS READY";
     return picks;
   }};
   const savedPredictions = readLocalPredictions();
@@ -799,26 +758,7 @@ def render_os_desktop(state: GameState) -> str:
       radio.addEventListener("change", collectPredictions);
     }});
   }});
-  root.querySelector(".k95-save-predictions")?.addEventListener("click", () => {{
-    sendBridge("worldcup_event_bridge", JSON.stringify({{
-      type: "save",
-      predictions: collectPredictions()
-    }}));
-  }});
-  root.querySelector(".k95-hf-signin")?.addEventListener("click", () => {{
-    collectPredictions();
-    const login = document.querySelector(
-      "#hf_login_button button, #hf_login_button a"
-    );
-    if (login) login.click();
-    else window.location.assign("/login/huggingface");
-  }});
-  if (Number(root.dataset.predictionCount || 0) === 0 && Object.keys(savedPredictions).length) {{
-    sendBridge("worldcup_event_bridge", JSON.stringify({{
-      type: "restore",
-      predictions: savedPredictions
-    }}));
-  }}
+  collectPredictions();
   root.querySelectorAll("[data-kickoff]").forEach((element) => {{
     const kickoff = new Date(element.dataset.kickoff);
     if (!Number.isNaN(kickoff.getTime())) {{
@@ -1017,7 +957,7 @@ def render_os_desktop(state: GameState) -> str:
 
   const terminal = root.querySelector(".k95-terminal-dock");
   const terminalTask = root.querySelector(".k95-mirror-task");
-  const terminalKey = "neon_trace_terminal_position";
+  const terminalKey = "kernel95_terminal_position";
   if (terminal) {{
     try {{
       const saved = JSON.parse(window.sessionStorage.getItem(terminalKey) || "{{}}");

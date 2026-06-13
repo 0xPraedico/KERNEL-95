@@ -1,4 +1,4 @@
-"""Neon Trace game package."""
+"""KERNEL-95 game package."""
 
 from .game_state import GameState
 

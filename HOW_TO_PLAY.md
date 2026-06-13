@@ -1,4 +1,4 @@
-# How to Play NEON TRACE
+# How to Play KERNEL-95
 
 ## Objective
 

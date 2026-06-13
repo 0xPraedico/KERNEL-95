@@ -52,11 +52,11 @@ def render_mirror_core_html(
   "use strict";
   const rootId = "{visual_id}";
   const CDN = "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js";
-  window.NeonTraceMirror = window.NeonTraceMirror || {{
+  window.Kernel95Mirror = window.Kernel95Mirror || {{
     loading: null,
     instances: new Map()
   }};
-  const ns = window.NeonTraceMirror;
+  const ns = window.Kernel95Mirror;
 
   function loadThree() {{
     if (window.THREE) return Promise.resolve(window.THREE);

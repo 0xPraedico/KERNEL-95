@@ -192,7 +192,7 @@ def demand_evidence_os(state: GameState) -> OSActionResult:
 def _debug_object_available(object_id: str) -> bool:
     item = OS_OBJECTS.get(object_id, {})
     return not item.get("debug_easter_egg") or os.getenv(
-        "NEON_TRACE_DEBUG_EASTER_EGGS", ""
+        "KERNEL95_DEBUG_EASTER_EGGS", ""
     ) == "1"
 
 

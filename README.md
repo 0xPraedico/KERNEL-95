@@ -1,5 +1,5 @@
 ---
-title: NEON TRACE - The Last Desktop
+title: KERNEL-95 - The Last Desktop
 emoji: 🖥️
 colorFrom: pink
 colorTo: purple
@@ -7,15 +7,13 @@ sdk: gradio
 sdk_version: 5.50.0
 app_file: app.py
 pinned: false
-hf_oauth: true
-hf_oauth_expiration_minutes: 43200
 ---
 
-# NEON TRACE: The Last Desktop
+# KERNEL-95: The Last Desktop
 
-NEON TRACE is a single-player forensic horror game presented as a recovered
-KERNEL-95 computer in 2077. Connect MIRROR.exe, investigate the hidden AI ECHO,
-verify every claim with deterministic tools, and submit a final judgment.
+KERNEL-95 is a single-player forensic horror game presented as a recovered
+computer from 2077. Connect MIRROR.exe, investigate the hidden AI ECHO, verify
+every claim with deterministic tools, and submit a final judgment.
 
 The exact player guide is in [HOW_TO_PLAY.md](HOW_TO_PLAY.md).
 
@@ -27,6 +25,8 @@ The exact player guide is in [HOW_TO_PLAY.md](HOW_TO_PLAY.md).
 - Deterministic Python tools own facts, unlocks, progression, and endings.
 - MIRROR and ECHO can use an optional OpenAI-compatible model for voice.
 - The full game works without a model or API key.
+- The World Cup shortcut uses live fixtures with browser-local mock predictions.
+  It has no account or remote persistence.
 
 ## Quick Demo
 
@@ -89,7 +89,6 @@ GPU, Modal, or an API key.
 ```text
 GRADIO_SERVER_NAME=0.0.0.0
 GRADIO_SERVER_PORT=7860
-NEON_TRACE_DEMO=1
 ```
 
 4. Leave the following secrets empty for deterministic fallback mode:
@@ -104,9 +103,6 @@ The app launches and remains fully playable when `OPENAI_API_KEY` is absent.
 If a configured model endpoint fails or times out, narration automatically
 returns to authored deterministic responses. Model output cannot create
 evidence, change unlocks, or select an ending.
-
-Optional Hugging Face OAuth variables used by debug-only experiments are not
-required for the main game.
 
 ## Optional Modal vLLM
 
@@ -131,7 +127,7 @@ Debug-only prototype shortcuts, including Tetris, are hidden from normal
 players and demos. They can be restored only for local development:
 
 ```bash
-NEON_TRACE_DEBUG_EASTER_EGGS=1 python app.py
+KERNEL95_DEBUG_EASTER_EGGS=1 python app.py
 ```
 
 ## Project Layout

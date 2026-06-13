@@ -1,4 +1,4 @@
-"""Mutable in-memory state for one Neon Trace session."""
+"""Mutable in-memory state for one KERNEL-95 session."""
 
 from __future__ import annotations
 
@@ -120,12 +120,6 @@ class GameState:
     mirror_claim_verified: bool = False
     restore_points_compared: bool = False
     demand_evidence_used: bool = False
-    world_cup_predictions: dict[str, str] = field(default_factory=dict)
-    world_cup_save_prompt: bool = False
-    world_cup_status: str = ""
-    leaderboard_unlocked: bool = False
-    hf_username: str = ""
-
     def adjust_trust(self, amount: int) -> None:
         self.trust = max(0, min(100, self.trust + amount))
         self.mirror_trust = self.trust
