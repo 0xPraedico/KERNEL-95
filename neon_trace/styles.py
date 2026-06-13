@@ -67,9 +67,10 @@ body::before {
     linear-gradient(rgba(85, 245, 255, 0.12) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 45, 166, 0.16) 1px, transparent 1px);
   background-size: 72px 72px;
-  perspective: 500px;
-  transform-origin: center bottom;
-  animation: grid-drift 24s linear infinite;
+  background-position: 0 0, 0 0;
+  transform: none;
+  animation: none;
+  will-change: auto;
   mask-image: linear-gradient(to bottom, transparent 2%, black 42%, transparent 96%);
 }
 
@@ -96,11 +97,6 @@ body::after {
     47% 0, 47% 48%, 51% 48%, 51% 17%, 61% 17%, 61% 38%, 66% 38%, 66% 9%,
     74% 9%, 74% 46%, 80% 46%, 80% 22%, 91% 22%, 91% 39%, 100% 39%, 100% 100%, 0 100%);
   filter: drop-shadow(0 -8px 22px rgba(255, 45, 166, 0.22));
-}
-
-@keyframes grid-drift {
-  from { background-position: 0 0, 0 0; }
-  to { background-position: 0 64px, 64px 0; }
 }
 
 .gradio-container {
@@ -336,7 +332,7 @@ footer {
     0 0 8px var(--hot-pink),
     0 0 20px rgba(255, 45, 166, 0.86),
     0 0 38px rgba(219, 31, 255, 0.46);
-  animation: mirror-pulse 2.2s ease-in-out infinite;
+  animation: none;
 }
 
 .mirror-orb::after {
@@ -345,17 +341,8 @@ footer {
   inset: -7px;
   border: 1px solid rgba(255, 45, 166, 0.5);
   border-radius: 50%;
-  animation: mirror-ring 2.2s ease-out infinite;
-}
-
-@keyframes mirror-pulse {
-  0%, 100% { transform: scale(0.88); filter: brightness(0.9); }
-  50% { transform: scale(1.12); filter: brightness(1.35); }
-}
-
-@keyframes mirror-ring {
-  0% { transform: scale(0.55); opacity: 0.8; }
-  75%, 100% { transform: scale(1.35); opacity: 0; }
+  opacity: 0.35;
+  animation: none;
 }
 
 /* Case status and meters */
@@ -1863,7 +1850,7 @@ button.terminal-action {
   pointer-events: none;
   background:
     linear-gradient(90deg, #008080 0%, rgba(0, 128, 128, 0.34) 24%, rgba(3, 1, 5, 0.08) 72%),
-    url("/gradio_api/file=assets/mirror-connect-background.png") 79% center / cover no-repeat;
+    url("/gradio_api/file=assets/mirror-connect-background.png") center center / cover no-repeat;
   filter: grayscale(0.25) contrast(1.18) saturate(0.9);
   opacity: 0.24;
   mix-blend-mode: screen;
@@ -1957,7 +1944,6 @@ button.terminal-action {
 .k95-mirror-wallpaper.state-lying,
 .k95-mirror-wallpaper.state-audited {
   opacity: 0.43;
-  background-position: 80% center;
 }
 
 .k95-mirror-wallpaper.state-echo_attached,
@@ -2356,7 +2342,7 @@ button.terminal-action {
   border-radius: 50%;
   background: #39ff73;
   box-shadow: 0 0 10px #39ff73;
-  animation: mirror-pulse 2.2s ease-in-out infinite;
+  animation: none;
 }
 
 .k95-mirror-app-status {
@@ -2591,7 +2577,11 @@ button.terminal-action {
 
 .k95-match-meta b.live {
   color: #b40000;
-  animation: mirror-pulse 1.1s ease-in-out infinite;
+  animation: k95-live-flicker 1.1s steps(2, end) infinite;
+}
+
+@keyframes k95-live-flicker {
+  50% { opacity: 0.97; }
 }
 
 .k95-match-teams {
@@ -2732,7 +2722,6 @@ button.terminal-action {
     0 0 28px rgba(255, 45, 166, 0.20);
   transition:
     opacity 160ms ease,
-    transform 120ms ease,
     inset 180ms ease,
     height 180ms ease;
 }
@@ -4002,6 +3991,116 @@ button.terminal-action {
 
   .os-notebook {
     grid-template-columns: 1fr;
+  }
+}
+
+/* KERNEL-95 stable layout guard */
+body::before,
+.gradio-container,
+.kernel95-desktop-output,
+.landing-page,
+.mirror-connect-gate,
+.k95-connect-gate,
+.mirror-connect-frame,
+.mirror-connect-copy,
+.mirror-connect-panel,
+.crt-chassis,
+.crt-bezel,
+.kernel95-desktop,
+.k95-workspace,
+.k95-mirror-wallpaper {
+  animation: none !important;
+  will-change: auto !important;
+}
+
+body::before,
+.gradio-container,
+.kernel95-desktop-output,
+.landing-page,
+.mirror-connect-gate,
+.k95-connect-gate,
+.mirror-connect-frame,
+.mirror-connect-copy,
+.mirror-connect-panel,
+.crt-chassis,
+.crt-bezel,
+.kernel95-desktop,
+.k95-workspace,
+.k95-mirror-wallpaper {
+  transform: none;
+}
+
+.mirror-connect-gate {
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.08), transparent 54%),
+    url("/gradio_api/file=assets/mirror-connect-background.png") center center / cover no-repeat,
+    #030104;
+  background-position: center center;
+  background-size: cover;
+}
+
+.k95-mirror-wallpaper {
+  background-position: 0 0, center center !important;
+  background-size: auto, cover !important;
+}
+
+.app-shell::before,
+.landing-page::before,
+.landing-page::after,
+.mirror-connect-gate::before,
+.mirror-connect-gate::after,
+.k95-connect-gate::before,
+.k95-connect-gate::after,
+.kernel95-desktop::before,
+.kernel95-desktop::after,
+.k95-mirror-wallpaper::before,
+.k95-mirror-wallpaper::after {
+  transform: none !important;
+  animation: none !important;
+  pointer-events: none;
+  will-change: auto !important;
+}
+
+.k95-window,
+.k95-terminal-dock {
+  animation: none !important;
+  will-change: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gradio-container,
+  .kernel95-desktop-output,
+  .landing-page,
+  .landing-page *,
+  .mirror-connect-gate,
+  .mirror-connect-gate *,
+  .k95-connect-gate,
+  .k95-connect-gate *,
+  .crt-chassis,
+  .crt-bezel,
+  .kernel95-desktop,
+  .k95-workspace,
+  .k95-mirror-wallpaper,
+  .k95-window,
+  .k95-terminal-dock {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .gradio-container,
+  .kernel95-desktop-output,
+  .landing-page,
+  .landing-page *,
+  .mirror-connect-gate,
+  .mirror-connect-gate *,
+  .k95-connect-gate,
+  .k95-connect-gate *,
+  .crt-chassis,
+  .crt-bezel,
+  .kernel95-desktop,
+  .k95-workspace,
+  .k95-mirror-wallpaper {
+    transform: none !important;
   }
 }
 """

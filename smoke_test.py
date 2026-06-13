@@ -95,6 +95,12 @@ def run() -> None:
         'url("/gradio_api/file=assets/mirror-connect-background.png") '
         "center center / cover no-repeat"
     ) in CSS
+    assert "/* KERNEL-95 stable layout guard */" in CSS
+    assert "@keyframes grid-drift" not in CSS
+    assert "animation: grid-drift" not in CSS
+    assert "@keyframes mirror-pulse" not in CSS
+    assert "animation: mirror-pulse" not in CSS
+    assert ".k95-terminal-dock {" in CSS
     assert "@keyframes k95-mirror-glitch" not in CSS
     assert ".k95-connect-gate * {" in CSS
     assert legacy_brand not in CSS
