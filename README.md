@@ -11,9 +11,27 @@ pinned: false
 
 # KERNEL-95: The Last Desktop
 
-KERNEL-95 is a single-player forensic horror game presented as a recovered
-computer from 2077. Connect MIRROR.exe, investigate the hidden AI ECHO, verify
-every claim with deterministic tools, and submit a final judgment.
+In 2077, you join the KERNEL-95 Recovery Division to investigate Device 013:
+an obsolete computer recovered from a sealed MetroGrid Behavioral Lab archive.
+It has no power source, yet it is still running. Three technicians who touched
+it each lost exactly thirteen minutes of memory.
+
+To enter the machine, you connect MIRROR.exe, your assigned forensic AI
+assistant. Inside a corrupted retro desktop, you open files, recover deleted
+messages, compare restore points, run contradiction scans, and search for ECHO:
+an unknown intelligence hiding inside the system.
+
+But MIRROR is not a neutral assistant. She diverts your questions, suppresses
+evidence, and rewrites her own testimony because she is secretly protecting
+ECHO.
+
+KERNEL-95 is an AI-native forensic game where the model performs MIRROR's
+evasions, ECHO's fragmented confessions, and the emotional tension between
+them, while a deterministic investigation engine protects the actual truth.
+
+At the end of Case 013, you decide whether to delete ECHO, extract him, expose
+MIRROR, protect them both, or allow something impossible to survive inside the
+last desktop.
 
 The exact player guide is in [HOW_TO_PLAY.md](HOW_TO_PLAY.md).
 
@@ -189,11 +207,10 @@ results are discarded and replaced by the authored fallback.
 ### Model evaluation
 
 `modal_voice_eval.py` runs the same 20 MIRROR prompts against a deployed model.
-The 14B baseline had a roughly 106-second cold start and generally took 2-5
-seconds warm. The 4B deployment had a roughly 97-second first cold start and
+The selected 4B deployment had a roughly 97-second first cold start and
 generally answered in 0.6-1.6 seconds warm.
 
-Both models invented technical details when asked to act as forensic reporters.
+The evaluation showed that generated technical reporting could invent details.
 The final design therefore narrows the model's job to subjective roleplay while
 the deterministic UI owns every fact. Under that voice-only protocol,
 `Qwen/Qwen3-4B-Instruct-2507` retained the eerie MIRROR performance with much
