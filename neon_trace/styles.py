@@ -1685,6 +1685,20 @@ button.terminal-action {
   .meter-fill {
     transition: none !important;
   }
+
+  .landing-page,
+  .landing-page::before,
+  .landing-page::after,
+  .landing-page *,
+  .landing-page *::before,
+  .landing-page *::after,
+  .mirror-connect-gate,
+  .mirror-connect-gate *,
+  .k95-connect-gate,
+  .k95-connect-gate * {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 
 @media (max-width: 800px) {
@@ -1849,20 +1863,27 @@ button.terminal-action {
   pointer-events: none;
   background:
     linear-gradient(90deg, #008080 0%, rgba(0, 128, 128, 0.34) 24%, rgba(3, 1, 5, 0.08) 72%),
-    url("/gradio_api/file=assets/mirror-connect-background.png") 79% center / auto 155% no-repeat;
+    url("/gradio_api/file=assets/mirror-connect-background.png") 79% center / cover no-repeat;
   filter: grayscale(0.25) contrast(1.18) saturate(0.9);
   opacity: 0.24;
   mix-blend-mode: screen;
+  transform: none;
+  animation: none;
   transition: opacity 300ms ease, filter 300ms ease;
+  will-change: auto;
 }
 
 .k95-mirror-wallpaper::after {
   content: "";
   position: absolute;
   inset: 0;
+  pointer-events: none;
   background:
     repeating-linear-gradient(0deg, transparent 0 5px, rgba(255, 31, 157, 0.055) 6px),
     linear-gradient(90deg, #008080 0%, transparent 48%, rgba(255, 45, 166, 0.11));
+  transform: none;
+  animation: none;
+  will-change: auto;
 }
 
 .k95-mirror-mask {
@@ -1931,7 +1952,6 @@ button.terminal-action {
 .k95-mirror-wallpaper.state-audited {
   opacity: 0.36;
   filter: contrast(1.5) saturate(1.45);
-  animation: k95-mirror-glitch 2.8s steps(2, end) infinite;
 }
 
 .k95-mirror-wallpaper.state-lying,
@@ -1944,14 +1964,6 @@ button.terminal-action {
 .k95-mirror-wallpaper.state-merge_pending {
   opacity: 0.48;
   filter: contrast(1.38) saturate(1.65) hue-rotate(5deg);
-  animation: k95-mirror-glitch 1.9s steps(2, end) infinite;
-}
-
-@keyframes k95-mirror-glitch {
-  0%, 88%, 100% { transform: translate(0); clip-path: inset(0); }
-  90% { transform: translate(-3px, 1px); clip-path: inset(9% 0 57%); }
-  93% { transform: translate(4px, -1px); clip-path: inset(58% 0 12%); }
-  96% { transform: translate(-1px, 0); clip-path: inset(0); }
 }
 
 .kernel95-desktop::before,
@@ -3626,10 +3638,13 @@ button.terminal-action {
   overflow: hidden;
   background:
     linear-gradient(90deg, rgba(0, 0, 0, 0.08), transparent 54%),
-    url("/gradio_api/file=assets/mirror-connect-background.png") center / cover no-repeat,
+    url("/gradio_api/file=assets/mirror-connect-background.png") center center / cover no-repeat,
     #030104;
   opacity: 1;
+  transform: none;
+  animation: none;
   transition: opacity 500ms ease, visibility 500ms ease;
+  will-change: auto;
 }
 
 .mirror-connect-gate::before {
@@ -3640,6 +3655,9 @@ button.terminal-action {
   background:
     repeating-linear-gradient(0deg, transparent 0 4px, rgba(255, 45, 166, 0.025) 5px),
     radial-gradient(circle at 26% 52%, rgba(255, 24, 151, 0.12), transparent 35%);
+  transform: none;
+  animation: none;
+  will-change: auto;
 }
 
 .mirror-connect-gate.connecting {
@@ -3655,12 +3673,16 @@ button.terminal-action {
 .mirror-connect-frame {
   position: absolute;
   inset: 20px;
+  pointer-events: none;
   border: 1px solid rgba(255, 45, 166, 0.72);
   clip-path: polygon(0 0, 3% 0, 3% 2px, 97% 2px, 97% 0, 100% 0, 100% 8%,
     calc(100% - 2px) 8%, calc(100% - 2px) 92%, 100% 92%, 100% 100%, 97% 100%,
     97% calc(100% - 2px), 3% calc(100% - 2px), 3% 100%, 0 100%, 0 92%, 2px 92%,
     2px 8%, 0 8%);
   box-shadow: inset 0 0 42px rgba(255, 45, 166, 0.08);
+  transform: none;
+  animation: none;
+  will-change: auto;
 }
 
 .mirror-connect-copy {
@@ -3668,6 +3690,9 @@ button.terminal-action {
   top: 27%;
   left: clamp(5%, 8vw, 11%);
   width: min(53vw, 760px);
+  transform: none;
+  animation: none;
+  will-change: auto;
 }
 
 .mirror-connect-panel {
@@ -3681,6 +3706,9 @@ button.terminal-action {
     inset 0 0 35px rgba(255, 45, 166, 0.08),
     0 0 28px rgba(255, 45, 166, 0.16);
   clip-path: polygon(3% 0, 97% 0, 100% 12%, 100% 88%, 97% 100%, 3% 100%, 0 88%, 0 12%);
+  transform: none;
+  animation: none;
+  will-change: auto;
 }
 
 .mirror-connect-panel h1 {
@@ -3721,12 +3749,13 @@ button.terminal-action {
     inset 0 0 28px rgba(255, 45, 166, 0.11),
     0 0 12px #ff2da6,
     0 0 34px rgba(255, 45, 166, 0.64) !important;
+  transition: color 140ms ease, background 140ms ease, box-shadow 140ms ease, transform 140ms ease;
 }
 
 .mirror-connect-button:hover {
   background: linear-gradient(180deg, #8d075d, #28031f) !important;
   color: #fff !important;
-  transform: translateY(-2px) !important;
+  transform: translateY(-1px) !important;
 }
 
 .mirror-connect-button svg {

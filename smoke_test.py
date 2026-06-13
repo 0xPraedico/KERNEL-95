@@ -38,6 +38,7 @@ from neon_trace.os_tools import (
     unlock_hidden_partition,
     verify_mirror_claim,
 )
+from neon_trace.styles import CSS
 
 
 FORBIDDEN_ACTIVE_LORE = ("Lena", "J-17", "Janitor", "Sector 7")
@@ -73,6 +74,7 @@ def run() -> None:
     assert "KERNEL-95" in desktop
     assert "CONNECT MIRROR.exe" in desktop
     assert "mirror-connect-gate" in desktop
+    assert 'class="landing-page mirror-connect-gate k95-connect-gate"' in desktop
     assert 'data-mirror-connected="false"' in desktop
     assert "k95-mirror-wallpaper state-offline" in desktop
     assert 'data-os-object="case_briefing_file"' in desktop
@@ -82,6 +84,13 @@ def run() -> None:
     assert "TETRIS.EXE" not in desktop
     assert "connect_mirror" in desktop
     assert "MutationObserver" in OS_DESKTOP_BOOTSTRAP
+    assert os.path.exists("assets/mirror-connect-background.png")
+    assert (
+        'url("/gradio_api/file=assets/mirror-connect-background.png") '
+        "center center / cover no-repeat"
+    ) in CSS
+    assert "@keyframes k95-mirror-glitch" not in CSS
+    assert ".k95-connect-gate * {" in CSS
     assert os.path.exists("HOW_TO_PLAY.md")
 
     locked = handle_terminal_input("dir", initial.selected_os_object, initial)

@@ -621,7 +621,7 @@ def render_os_desktop(state: GameState) -> str:
     )
 
     return f"""
-<section class="mirror-connect-gate{" connected" if state.mirror_connected else ""}" aria-label="Connect MIRROR.exe">
+<section class="landing-page mirror-connect-gate k95-connect-gate{" connected" if state.mirror_connected else ""}" aria-label="Connect MIRROR.exe">
   <div class="mirror-connect-frame" aria-hidden="true"></div>
   <div class="mirror-connect-copy">
     <div class="mirror-connect-panel">
