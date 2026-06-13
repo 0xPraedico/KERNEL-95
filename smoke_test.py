@@ -10,6 +10,7 @@ os.environ.pop("KERNEL95_DEBUG_EASTER_EGGS", None)
 
 import app
 import neon_trace.os_desktop as os_desktop
+from neon_trace import ai_engine
 from neon_trace.ai_engine import mirror_terminal_response
 from neon_trace.game_state import new_game
 from neon_trace.os_actions import (
@@ -264,6 +265,39 @@ def run() -> None:
     )
     assert fallback
     assert "ECHO" in fallback
+
+    captured_request = {}
+
+    class FakeCompletions:
+        @staticmethod
+        def create(**kwargs):
+            captured_request.update(kwargs)
+            message = type("Message", (), {"content": "MIRROR> Modal link active."})()
+            choice = type("Choice", (), {"message": message})()
+            return type("Response", (), {"choices": [choice]})()
+
+    fake_client = type(
+        "FakeClient",
+        (),
+        {"chat": type("Chat", (), {"completions": FakeCompletions()})()},
+    )()
+    original_client = ai_engine._client
+    original_model = os.environ.get("OPENAI_MODEL")
+    ai_engine._client = lambda: fake_client
+    os.environ["OPENAI_MODEL"] = "Qwen/Qwen3-14B"
+    try:
+        model_reply = ai_engine.call_llm("MIRROR system", "Confirm link.")
+    finally:
+        ai_engine._client = original_client
+        if original_model is None:
+            os.environ.pop("OPENAI_MODEL", None)
+        else:
+            os.environ["OPENAI_MODEL"] = original_model
+    assert model_reply == "MIRROR> Modal link active."
+    assert captured_request["model"] == "Qwen/Qwen3-14B"
+    assert captured_request["extra_body"] == {
+        "chat_template_kwargs": {"enable_thinking": False}
+    }
 
     rendered_active = render_os_desktop(prepare_breach_state())
     assert not any(term in rendered_active for term in FORBIDDEN_ACTIVE_LORE)

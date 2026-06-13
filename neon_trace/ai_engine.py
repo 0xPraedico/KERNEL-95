@@ -40,14 +40,21 @@ def call_llm(system_prompt: str, user_prompt: str, temperature: float = 0.7) -> 
         return ""
     model = os.getenv("OPENAI_MODEL", "gpt-4.1-mini").strip() or "gpt-4.1-mini"
     try:
-        response = client.chat.completions.create(
-            model=model,
-            messages=[
+        request: dict[str, Any] = {
+            "model": model,
+            "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
-            temperature=temperature,
-            max_tokens=220,
+            "temperature": temperature,
+            "max_tokens": 220,
+        }
+        if model.lower().startswith("qwen/qwen3"):
+            request["extra_body"] = {
+                "chat_template_kwargs": {"enable_thinking": False}
+            }
+        response = client.chat.completions.create(
+            **request,
         )
         return (response.choices[0].message.content or "").strip()
     except Exception:

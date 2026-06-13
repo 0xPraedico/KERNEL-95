@@ -104,22 +104,63 @@ If a configured model endpoint fails or times out, narration automatically
 returns to authored deterministic responses. Model output cannot create
 evidence, change unlocks, or select an ending.
 
-## Optional Modal vLLM
+## Modal vLLM backend
 
-Modal/vLLM support is planned as an optional narration backend. It is not
-required to launch the Space.
+The Hugging Face Space runs the KERNEL-95 game UI. Modal runs
+`Qwen/Qwen3-14B` behind vLLM's OpenAI-compatible API. The model only supplies
+MIRROR/ECHO voice; deterministic tools remain authoritative and model output
+cannot mutate `GameState`.
 
-For a future OpenAI-compatible Modal endpoint:
+Create a local environment:
 
-```text
-OPENAI_API_KEY=your-endpoint-key
-OPENAI_BASE_URL=https://your-modal-endpoint.example/v1
-OPENAI_MODEL=Qwen/Qwen2.5-14B-Instruct
+```bash
+conda create -n kernel95-modal python=3.11 -y
+conda activate kernel95-modal
+python -m pip install "modal>=1.0.0" openai
+python -m modal setup
 ```
 
-Start with `Qwen/Qwen2.5-14B-Instruct`. Keep the Hugging Face Space on CPU; the
-remote Modal service owns model inference. The endpoint must expose an
-OpenAI-compatible `/v1/chat/completions` route.
+Create the Modal secret used by `modal_vllm.py`. Choose a private API key and
+reuse exactly the same value in the Hugging Face Space:
+
+```bash
+export KERNEL95_MODAL_API_KEY="replace-with-a-long-random-value"
+modal secret create kernel95-modal-api-key \
+  KERNEL95_MODAL_API_KEY="$KERNEL95_MODAL_API_KEY"
+```
+
+Deploy the vLLM server:
+
+```bash
+modal deploy modal_vllm.py
+```
+
+Modal returns an HTTPS endpoint after deployment. Use its `/v1` path as the
+OpenAI base URL:
+
+```text
+https://<modal-endpoint>/v1
+```
+
+Set these Hugging Face Space secrets:
+
+```text
+OPENAI_API_KEY=<same api key used by Modal>
+OPENAI_BASE_URL=https://<modal-endpoint>/v1
+OPENAI_MODEL=Qwen/Qwen3-14B
+```
+
+Test the deployed endpoint with the same variables in your local shell:
+
+```bash
+python test_modal_endpoint.py
+```
+
+The Modal deployment uses an L40S GPU, a persistent `kernel95-hf-cache` volume,
+and scales to zero after five idle minutes. A cold request may therefore take
+longer while the container starts. If Modal fails, times out, or is asleep,
+KERNEL-95 falls back to deterministic authored responses and remains fully
+playable without `OPENAI_API_KEY`.
 
 ## Optional Debug Easter Eggs
 
