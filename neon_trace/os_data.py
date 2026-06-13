@@ -214,7 +214,6 @@ OS_OBJECTS: dict[str, dict[str, object]] = {
         "type": "external", "label": "Claude Code", "icon": "CLD",
         "description": "Definitely Claude. Nothing suspicious here.",
         "external_url": "https://chatgpt.com/",
-        "debug_easter_egg": True,
     },
     "tetris_95": {
         "type": "game", "label": "TETRIS.EXE", "icon": "T",
@@ -226,7 +225,6 @@ OS_OBJECTS: dict[str, dict[str, object]] = {
         "type": "game", "label": "WORLD CUP 26", "icon": "WC",
         "description": "Live World Cup 2026 match predictions.",
         "window": "WORLD_CUP_2026",
-        "debug_easter_egg": True,
     },
     "secret_leaderboard": {
         "type": "secret", "label": "HF Rankings", "icon": "HF",

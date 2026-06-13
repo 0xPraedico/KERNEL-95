@@ -2,7 +2,7 @@
 title: NEON TRACE - The Last Desktop
 emoji: 🖥️
 colorFrom: pink
-colorTo: cyan
+colorTo: purple
 sdk: gradio
 sdk_version: 5.50.0
 app_file: app.py
@@ -127,8 +127,8 @@ OpenAI-compatible `/v1/chat/completions` route.
 
 ## Optional Debug Easter Eggs
 
-Unrelated prototype shortcuts are hidden from normal players and demos. They
-can be restored only for local development:
+Debug-only prototype shortcuts, including Tetris, are hidden from normal
+players and demos. They can be restored only for local development:
 
 ```bash
 NEON_TRACE_DEBUG_EASTER_EGGS=1 python app.py

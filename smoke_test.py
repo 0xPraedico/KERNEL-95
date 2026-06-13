@@ -77,8 +77,8 @@ def run() -> None:
     assert "k95-mirror-wallpaper state-offline" in desktop
     assert 'data-os-object="case_briefing_file"' in desktop
     assert 'data-os-object="tetris_95"' not in desktop
-    assert 'data-os-object="world_cup_2026"' not in desktop
-    assert 'data-os-object="claude_code"' not in desktop
+    assert 'data-os-object="world_cup_2026"' in desktop
+    assert 'data-os-object="claude_code"' in desktop
     assert "TETRIS.EXE" not in desktop
     assert "connect_mirror" in desktop
     assert "MutationObserver" in OS_DESKTOP_BOOTSTRAP
