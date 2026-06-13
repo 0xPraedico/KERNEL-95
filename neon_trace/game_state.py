@@ -216,8 +216,8 @@ class GameState:
 
     def maybe_unlock_secret(self) -> bool:
         qualified = (
-            self.challenged_mirror_count >= 2
-            and self.contradiction_scans >= 2
+            self.challenged_mirror_count >= 1
+            and self.contradiction_scans >= 1
             and "duplicate_token" in self.discovered_clues
         )
         if not qualified or self.secret_unlocked:
@@ -235,8 +235,8 @@ class GameState:
 
     def update_vault_access(self) -> bool:
         qualified = (
-            self.challenged_mirror_count >= 2
-            and self.contradiction_scans >= 2
+            self.challenged_mirror_count >= 1
+            and self.contradiction_scans >= 1
             and "duplicate_token" in self.discovered_clues
         )
         if not qualified or self.memory_vault_unlocked:

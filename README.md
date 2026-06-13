@@ -43,7 +43,7 @@ in the public Git history.
 2. Open `CASE_013_BRIEFING.txt`.
 3. Ask MIRROR about ECHO.
 4. Recover `echo_letter_01.tmp` from the Recycle Bin.
-5. Challenge MIRROR twice and run two contradiction scans.
+5. Challenge MIRROR once and run one contradiction scan.
 6. Compare restore points or run `verify mirror`.
 7. Run `audit mirror`, then `unlock hidden_partition`.
 8. Inspect ECHO's files and submit the Final Judgment.

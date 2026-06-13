@@ -365,6 +365,8 @@ def recover_deleted_file(file_id: str, state: GameState) -> OSToolResult:
         progress = 15
     if first_recovery:
         state.deleted_files_recovered.append(file_id)
+    if file_id not in state.inspected_files:
+        state.inspected_files.append(file_id)
     return _record(
         state,
         "recover_deleted_file",
@@ -494,8 +496,8 @@ def audit_mirror_private_logs(state: GameState) -> OSToolResult:
     chain_verified = state.restore_points_compared or state.mirror_claim_verified
     qualified = (
         "echo_letter_01" in state.deleted_files_recovered
-        and state.challenged_mirror_count >= 2
-        and state.contradiction_scans >= 2
+        and state.challenged_mirror_count >= 1
+        and state.contradiction_scans >= 1
         and chain_verified
     )
     if not qualified:
@@ -504,7 +506,7 @@ def audit_mirror_private_logs(state: GameState) -> OSToolResult:
             "audit_mirror_private_logs",
             OSToolResult(
                 "MIRROR AUDIT LOCKED",
-                "Requires two MIRROR challenges, two contradiction scans, "
+                "Requires one MIRROR challenge, one contradiction scan, "
                 "echo_letter_01.tmp recovery, and a restore comparison or MIRROR verification.",
                 severity="warning",
             ),
@@ -534,8 +536,8 @@ def unlock_hidden_partition(state: GameState) -> OSToolResult:
     chain_verified = state.restore_points_compared or state.mirror_claim_verified
     qualified = (
         state.mirror_audit_unlocked
-        and state.challenged_mirror_count >= 2
-        and state.contradiction_scans >= 2
+        and state.challenged_mirror_count >= 1
+        and state.contradiction_scans >= 1
         and "echo_letter_01" in state.deleted_files_recovered
         and chain_verified
     )
@@ -545,8 +547,8 @@ def unlock_hidden_partition(state: GameState) -> OSToolResult:
             "unlock_hidden_partition",
             OSToolResult(
                 "HIDDEN PARTITION LOCKED",
-                f"Progress {state.hidden_partition_progress}%. Requires two MIRROR challenges, "
-                "two contradiction scans, echo_letter_01.tmp, verified restore evidence, "
+                f"Progress {state.hidden_partition_progress}%. Requires one MIRROR challenge, "
+                "one contradiction scan, echo_letter_01.tmp, verified restore evidence, "
                 "and the MIRROR private-log audit.",
                 severity="warning",
             ),

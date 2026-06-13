@@ -194,10 +194,10 @@ def handle_3d_interaction(action: str, object_id: str, state: GameState) -> Game
             )
         if object_type == "vault":
             missing = []
-            if state.challenged_mirror_count < 2:
-                missing.append(f"challenge MIRROR {2 - state.challenged_mirror_count} more time(s)")
-            if state.contradiction_scans < 2:
-                missing.append(f"run {2 - state.contradiction_scans} more contradiction scan(s)")
+            if state.challenged_mirror_count < 1:
+                missing.append("challenge MIRROR once")
+            if state.contradiction_scans < 1:
+                missing.append("run one contradiction scan")
             if "duplicate_token" not in state.discovered_clues:
                 missing.append("prove duplicate J-17")
             message = (

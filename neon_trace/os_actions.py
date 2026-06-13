@@ -135,7 +135,7 @@ def trust_mirror_os(state: GameState) -> OSActionResult:
     """Resolve trust inside the KERNEL-95 case without legacy investigation lore."""
     if not state.mirror_connected:
         return _locked_result(state)
-    early_case = not state.mirror_audit_unlocked and state.contradiction_scans < 2
+    early_case = not state.mirror_audit_unlocked and state.contradiction_scans < 1
     state.trust_mirror_count += 1
     state.adjust_trust(6)
     state.adjust_instability(-2)

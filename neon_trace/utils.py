@@ -165,8 +165,8 @@ def render_notebook(state: GameState) -> str:
 def render_game_hud(state: GameState) -> str:
     obj = GAME_OBJECTS.get(state.selected_3d_object, GAME_OBJECTS["mirror_core"])
     vault_steps = [
-        (state.challenged_mirror_count, 2, "MIRROR CHALLENGES"),
-        (state.contradiction_scans, 2, "CONTRADICTION SCANS"),
+        (state.challenged_mirror_count, 1, "MIRROR CHALLENGE"),
+        (state.contradiction_scans, 1, "CONTRADICTION SCAN"),
         (1 if "duplicate_token" in state.discovered_clues else 0, 1, "J-17 DUPLICATION"),
     ]
     vault_progress = sum(min(current, required) for current, required, _ in vault_steps)
@@ -214,7 +214,7 @@ def render_objectives(state: GameState) -> str:
         ("Find duplicate token", "duplicate_token" in state.discovered_clues),
         ("Inspect commit", "janitor_commit" in state.discovered_clues),
         ("Decode memory filter", "thirteen_minute_filter" in state.discovered_clues),
-        ("Challenge MIRROR twice", state.challenged_mirror_count >= 2),
+        ("Challenge MIRROR", state.challenged_mirror_count >= 1),
         ("Audit MIRROR memory", state.secret_unlocked),
         ("Submit accusation", state.accusation_submitted),
     ]
@@ -233,8 +233,8 @@ def render_objectives(state: GameState) -> str:
   {rows}
   <details>
     <summary>DEMO PATH</summary>
-    <p>Select and scan the Sector Log. Run a forensic scan. Trace J-17. Challenge MIRROR twice.
-    Run a second scan, breach the vault, then build the accusation.</p>
+    <p>Select and scan the Sector Log. Run a forensic scan. Trace J-17. Challenge MIRROR once,
+    breach the vault, then build the accusation.</p>
   </details>
 </div>
 """

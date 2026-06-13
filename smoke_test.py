@@ -54,8 +54,6 @@ def prepare_breach_state():
     inspect_file("mirror_claim_01", state)
     recover_deleted_file("echo_letter_01", state)
     challenge_mirror_os(state)
-    challenge_mirror_os(state)
-    run_contradiction_scan(state)
     run_contradiction_scan(state)
     inspect_file("restore_1998", state)
     inspect_file("restore_2077", state)
@@ -285,6 +283,15 @@ def run() -> None:
     assert selected.selected_file == "case_briefing"
     assert "case_briefing" in callback_state.inspected_files
 
+    handle_os_event("open:recycle_bin", callback_state)
+    recovered_letter = handle_os_event("recover:echo_letter_01", callback_state)
+    letter_window = render_os_desktop(callback_state)
+    assert recovered_letter.selected_file == "echo_letter_01"
+    assert callback_state.active_document_id == "echo_letter_01"
+    assert "echo_letter_01" in callback_state.inspected_files
+    assert "ASK MIRROR ABOUT THIS FILE" in letter_window
+    assert "If you found this, she sent you." in letter_window
+
     trace_state = new_game()
     connect_mirror(trace_state)
     weak_trace = handle_terminal_input(
@@ -307,6 +314,8 @@ def run() -> None:
     assert trace_state.echo_messages
 
     state = prepare_breach_state()
+    assert state.challenged_mirror_count == 1
+    assert state.contradiction_scans == 1
     audit = audit_mirror_private_logs(state)
     assert audit.title == "MIRROR PRIVATE LOG RECOVERED"
     assert state.mirror_audit_unlocked

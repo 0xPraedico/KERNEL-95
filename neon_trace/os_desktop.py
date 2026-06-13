@@ -312,8 +312,8 @@ def _desktop_window(state: GameState) -> str:
             if state.hidden_partition_unlocked
             else (
                 '<div class="k95-locked-message">RECOVERY REQUIREMENTS<br><br>'
-                f'[{"OK" if state.challenged_mirror_count >= 2 else ".."}] Challenge MIRROR twice<br>'
-                f'[{"OK" if state.contradiction_scans >= 2 else ".."}] Run two contradiction scans<br>'
+                f'[{"OK" if state.challenged_mirror_count >= 1 else ".."}] Challenge MIRROR once<br>'
+                f'[{"OK" if state.contradiction_scans >= 1 else ".."}] Run one contradiction scan<br>'
                 f'[{"OK" if "echo_letter_01" in state.deleted_files_recovered else ".."}] Recover echo_letter_01.tmp<br>'
                 f'[{"OK" if state.restore_points_compared or state.mirror_claim_verified else ".."}] Compare restore points or verify MIRROR<br>'
                 f'[{"OK" if state.mirror_audit_unlocked else ".."}] Audit MIRROR private logs</div>'
@@ -1147,8 +1147,8 @@ def render_os_objectives(state: GameState) -> str:
         )),
         ("Classify MIRROR testimony", state.successful_testimony_reads >= 1),
         ("Recover ECHO's letter", "echo_letter_01" in state.deleted_files_recovered),
-        ("Challenge MIRROR twice", state.challenged_mirror_count >= 2),
-        ("Run two scans", state.contradiction_scans >= 2),
+        ("Challenge MIRROR", state.challenged_mirror_count >= 1),
+        ("Run contradiction scan", state.contradiction_scans >= 1),
         (
             "Check restore evidence",
             state.restore_points_compared or state.mirror_claim_verified,

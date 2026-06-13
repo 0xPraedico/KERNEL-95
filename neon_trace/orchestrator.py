@@ -118,7 +118,7 @@ def challenge_mirror(state: GameState) -> InteractionResult:
     state.adjust_trust(-5)
     state.adjust_bias(-10)
     state.adjust_instability(4)
-    if state.challenged_mirror_count >= 2:
+    if state.challenged_mirror_count >= 1:
         state.discover("mirror_bias")
         state.mirror_memory_audit_unlocked = True
     state.tool_trace.append(
@@ -127,11 +127,11 @@ def challenge_mirror(state: GameState) -> InteractionResult:
             "title": "CLAIM AUDITED",
             "summary": f"MIRROR bias reduced to {state.mirror_bias_level}.",
             "severity": "medium",
-            "new_clues": ["mirror_bias"] if state.challenged_mirror_count >= 2 else [],
+            "new_clues": ["mirror_bias"] if state.challenged_mirror_count >= 1 else [],
         }
     )
     state.add_feed(
-        f"CHALLENGE // MIRROR claim audited ({state.challenged_mirror_count}/2 for memory access)."
+        f"CHALLENGE // MIRROR claim audited ({state.challenged_mirror_count}/1 for memory access)."
     )
     vault_ready = state.update_vault_access()
     message = MirrorAgent().challenge_response(state)

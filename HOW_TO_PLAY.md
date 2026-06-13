@@ -89,7 +89,7 @@ Open **Control Panel** or use the terminal action buttons:
 - **Demand Evidence** forces MIRROR to show whether her claim is supported.
 - **Run Contradiction Scan** compares known claims with recovered facts.
 
-Challenge MIRROR twice and run two contradiction scans.
+Challenge MIRROR once and run one contradiction scan.
 
 ### 7. Verify the Timeline
 

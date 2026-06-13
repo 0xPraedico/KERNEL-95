@@ -362,16 +362,16 @@ def run_test(test_name: str, state: GameState) -> ToolResult:
 
 def query_mirror_suppressed(state: GameState, record_denial: bool = True) -> ToolResult:
     qualified = (
-        state.challenged_mirror_count >= 2
-        and state.contradiction_scans >= 2
+        state.challenged_mirror_count >= 1
+        and state.contradiction_scans >= 1
         and "duplicate_token" in state.discovered_clues
     )
     if not qualified:
         missing = []
-        if state.challenged_mirror_count < 2:
-            missing.append(f"challenges {state.challenged_mirror_count}/2")
-        if state.contradiction_scans < 2:
-            missing.append(f"scans {state.contradiction_scans}/2")
+        if state.challenged_mirror_count < 1:
+            missing.append(f"challenges {state.challenged_mirror_count}/1")
+        if state.contradiction_scans < 1:
+            missing.append(f"scans {state.contradiction_scans}/1")
         if "duplicate_token" not in state.discovered_clues:
             missing.append("duplicate_j17 unproven")
         result = ToolResult(
