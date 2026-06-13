@@ -17,6 +17,15 @@ every claim with deterministic tools, and submit a final judgment.
 
 The exact player guide is in [HOW_TO_PLAY.md](HOW_TO_PLAY.md).
 
+## OpenAI Codex Track
+
+Public source repository:
+[github.com/0xPraedico/KERNEL-95](https://github.com/0xPraedico/KERNEL-95)
+
+KERNEL-95 was developed with OpenAI Codex as the coding agent. Codex-attributed
+commits include the `Co-authored-by: OpenAI Codex <codex@openai.com>` trailer
+in the public Git history.
+
 ## Core Game
 
 - A movable late-1990s desktop inside a CRT.
