@@ -35,8 +35,8 @@ api_secret = modal.Secret.from_name("kernel95-modal-api-key")
 
 @app.function(
     image=image,
-    gpu="L40S",
-    min_containers=0,
+    gpu="L4",
+    min_containers=1,
     max_containers=1,
     timeout=15 * MINUTES,
     scaledown_window=5 * MINUTES,

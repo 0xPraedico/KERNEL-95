@@ -165,9 +165,11 @@ Test the deployed endpoint with the same variables in your local shell:
 python test_modal_endpoint.py
 ```
 
-The Modal deployment uses an L40S GPU, a persistent `kernel95-hf-cache` volume,
-and scales to zero after five idle minutes. A cold request may therefore take
-longer while the container starts. If Modal fails, times out, or is asleep,
+The Modal deployment keeps one L4 container warm, uses a persistent
+`kernel95-hf-cache` volume, and caps the deployment at one replica. This avoids
+the normal scale-to-zero delay for the first MIRROR message. At Modal's
+published L4 rate of `$0.000222/second`, seven continuously warm days cost about
+`$134.27` for the GPU, plus CPU and memory. If Modal fails or restarts,
 KERNEL-95 falls back to deterministic authored responses and remains fully
 playable without `OPENAI_API_KEY`.
 
