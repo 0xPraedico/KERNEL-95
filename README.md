@@ -7,6 +7,12 @@ sdk: gradio
 sdk_version: 5.50.0
 app_file: app.py
 pinned: false
+tags:
+  - track:wood
+  - sponsor:openai
+  - sponsor:modal
+  - achievement:offbrand
+  - achievement:tiny
 ---
 
 # KERNEL-95: The Last Desktop
