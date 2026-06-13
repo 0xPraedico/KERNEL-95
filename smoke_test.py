@@ -100,6 +100,9 @@ def run() -> None:
     assert "animation: grid-drift" not in CSS
     assert "@keyframes mirror-pulse" not in CSS
     assert "animation: mirror-pulse" not in CSS
+    assert 'content: "NIGHT CITY // SECTOR 07"' not in CSS
+    assert 'content: "2077 // METROGRID"' not in CSS
+    assert "scrollbar-gutter: stable" in CSS
     assert ".k95-terminal-dock {" in CSS
     assert "@keyframes k95-mirror-glitch" not in CSS
     assert ".k95-connect-gate * {" in CSS

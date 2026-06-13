@@ -38,11 +38,14 @@ CSS = r"""
 html {
   background: var(--bg);
   color-scheme: dark;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
 }
 
 body {
   min-height: 100vh;
   margin: 0;
+  overflow-x: hidden;
   background:
     radial-gradient(circle at 10% 4%, rgba(255, 31, 166, 0.28), transparent 30rem),
     radial-gradient(circle at 91% 20%, rgba(0, 229, 255, 0.20), transparent 36rem),
@@ -118,29 +121,16 @@ body::after {
 
 .gradio-container::before,
 .gradio-container::after {
-  position: fixed;
-  z-index: -1;
-  top: 15%;
-  padding: 15px 9px;
-  border: 1px solid currentColor;
-  background: rgba(4, 2, 8, 0.82);
-  font: 800 10px/1.2 "JetBrains Mono", monospace;
-  letter-spacing: 0.18em;
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  box-shadow: 0 0 24px currentColor;
+  content: none !important;
+  display: none !important;
 }
 
 .gradio-container::before {
-  content: "NIGHT CITY // SECTOR 07";
-  left: 18px;
-  color: #ff2da6;
+  content: none;
 }
 
 .gradio-container::after {
-  content: "2077 // METROGRID";
-  right: 18px;
-  color: #55f5ff;
+  content: none;
 }
 
 .gradio-container > footer,
@@ -3640,9 +3630,10 @@ button.terminal-action {
 
 .mirror-connect-copy {
   position: absolute;
-  top: 27%;
-  left: clamp(5%, 8vw, 11%);
-  width: min(53vw, 760px);
+  top: clamp(72px, 12vh, 150px);
+  left: clamp(24px, 8vw, 120px);
+  width: min(760px, calc(100% - clamp(48px, 16vw, 240px)));
+  max-width: calc(100% - 48px);
   transform: none;
   animation: none;
   will-change: auto;
@@ -3666,9 +3657,12 @@ button.terminal-action {
 
 .mirror-connect-panel h1 {
   margin: 0;
+  max-width: 100%;
+  overflow: hidden;
   color: #ff40ad;
-  font: 900 clamp(48px, 7vw, 108px)/0.92 "JetBrains Mono", "Lucida Console", monospace;
+  font: 900 clamp(42px, 6vw, 92px)/0.94 "JetBrains Mono", "Lucida Console", monospace;
   letter-spacing: 0.02em;
+  overflow-wrap: anywhere;
   text-shadow: 0 0 12px rgba(255, 45, 166, 0.72), 0 0 38px rgba(255, 45, 166, 0.28);
 }
 
@@ -3686,7 +3680,7 @@ button.terminal-action {
 
 .mirror-connect-button {
   display: flex !important;
-  width: min(78%, 560px) !important;
+  width: min(100%, 560px) !important;
   min-height: 88px !important;
   margin: 24px auto 0 !important;
   gap: 20px;
@@ -3703,6 +3697,64 @@ button.terminal-action {
     0 0 12px #ff2da6,
     0 0 34px rgba(255, 45, 166, 0.64) !important;
   transition: color 140ms ease, background 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+}
+
+@media (max-width: 900px) {
+  .mirror-connect-copy {
+    top: clamp(48px, 10vh, 90px);
+    right: 24px;
+    left: 24px;
+    width: auto;
+    max-width: none;
+  }
+
+  .mirror-connect-panel {
+    padding: 30px 34px;
+  }
+
+  .mirror-connect-panel h1 {
+    font-size: clamp(40px, 9vw, 68px);
+  }
+
+  .mirror-connect-panel p {
+    font-size: clamp(16px, 3.5vw, 25px) !important;
+  }
+
+  .mirror-connect-button {
+    min-height: 72px !important;
+    font-size: clamp(15px, 3.3vw, 23px) !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .mirror-connect-frame {
+    inset: 10px;
+  }
+
+  .mirror-connect-copy {
+    top: 56px;
+    right: 14px;
+    left: 14px;
+  }
+
+  .mirror-connect-panel {
+    padding: 24px 20px;
+  }
+
+  .mirror-connect-panel h1 {
+    font-size: clamp(34px, 12vw, 52px);
+  }
+
+  .mirror-connect-button {
+    gap: 10px;
+    min-height: 64px !important;
+    padding: 10px 12px !important;
+  }
+
+  .mirror-connect-button svg {
+    width: 26px;
+    height: 26px;
+  }
 }
 
 .mirror-connect-button:hover {
