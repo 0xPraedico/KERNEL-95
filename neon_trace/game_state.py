@@ -117,10 +117,14 @@ class GameState:
     echo_core_unlocked: bool = False
     final_judgment_unlocked: bool = False
     final_judgment_submitted: bool = False
+    active_document_id: str | None = None
     ending_id: str | None = None
     ending_title: str = ""
     ending_score: int = 0
+    ending_decision: str = ""
     ending_narration: str = ""
+    ending_consequence: str = ""
+    ending_epilogue: str = ""
     ending_breakdown: dict[str, int] = field(default_factory=dict)
     mirror_claim_verified: bool = False
     restore_points_compared: bool = False

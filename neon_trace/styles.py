@@ -1803,8 +1803,8 @@ button.terminal-action {
 
 .kernel95-desktop {
   position: relative;
-  height: clamp(930px, 91vh, 1120px);
-  min-height: 930px;
+  height: clamp(1015px, 96vh, 1220px);
+  min-height: 1015px;
   overflow: hidden;
   border: 2px solid #050807;
   border-radius: 24px / 17px;
@@ -1822,7 +1822,7 @@ button.terminal-action {
 
 .k95-workspace {
   position: absolute;
-  inset: 0 0 390px;
+  inset: 0 0 474px;
   overflow: hidden;
   background:
     radial-gradient(circle at 72% 36%, rgba(255, 255, 255, 0.035), transparent 30%),
@@ -2190,7 +2190,7 @@ button.terminal-action {
 
 .k95-document,
 .k95-boot-text {
-  max-height: 480px;
+  max-height: 510px;
   margin: 0;
   overflow: auto;
   border: 2px inset #efefef;
@@ -2199,6 +2199,68 @@ button.terminal-action {
   padding: 18px;
   white-space: pre-wrap;
   font: 16px/1.7 "Lucida Console", "Courier New", monospace;
+}
+
+.k95-document-window {
+  top: 5%;
+  left: 18%;
+  width: 66%;
+  min-width: 650px;
+  max-height: 91%;
+}
+
+.k95-document-toolbar {
+  display: grid;
+  grid-template-columns: 1.5fr 0.8fr 0.8fr;
+  gap: 7px;
+  margin-bottom: 8px;
+}
+
+.k95-document-toolbar > div {
+  display: grid;
+  gap: 2px;
+  padding: 7px 9px;
+  border: 2px inset #eee;
+  background: #e8e8e8;
+}
+
+.k95-document-toolbar small {
+  color: #555;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.k95-document-toolbar b {
+  overflow-wrap: anywhere;
+  color: #111;
+  font-size: 13px;
+}
+
+.k95-document-toolbar .strength-critical {
+  color: #95004f;
+}
+
+.k95-document-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.k95-document-actions .k95-file-button {
+  flex: 1;
+  min-height: 42px !important;
+  padding: 9px 12px !important;
+  border: 2px outset #eee !important;
+  background: #c0c0c0 !important;
+  color: #000080 !important;
+  font-weight: 800 !important;
+  text-align: center !important;
+}
+
+.k95-document-actions .k95-file-button:hover {
+  border-style: inset !important;
+  background: #000080 !important;
+  color: #fff !important;
 }
 
 .k95-boot-text {
@@ -2253,6 +2315,8 @@ button.terminal-action {
 
 .k95-file-list li {
   display: flex;
+  gap: 12px;
+  align-items: center;
   justify-content: space-between;
   padding: 11px;
   border-bottom: 1px dotted #777;
@@ -2265,15 +2329,40 @@ button.terminal-action {
 .k95-file-button {
   min-width: 0 !important;
   min-height: 0 !important;
-  padding: 2px 5px !important;
+  min-height: 32px !important;
+  padding: 5px 8px !important;
   border: 1px dotted transparent !important;
   border-radius: 0 !important;
   background: transparent !important;
   color: #000080 !important;
-  font: 14px/1.45 "MS Sans Serif", Tahoma, Arial, sans-serif !important;
+  font: 15px/1.45 "MS Sans Serif", Tahoma, Arial, sans-serif !important;
   text-align: left !important;
   box-shadow: none !important;
   transform: none !important;
+}
+
+.k95-drive-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+  padding: 7px;
+  border: 2px inset #eee;
+  background: #fff;
+  color: #111;
+  font: 700 13px/1.4 "Lucida Console", monospace;
+}
+
+.k95-file-heading {
+  margin: 12px 8px 4px;
+  color: #000080;
+  font-size: 13px;
+}
+
+.k95-case-file-list {
+  max-height: 340px;
+  overflow: auto;
+  background: #fff;
+  border: 2px inset #eee;
 }
 
 .k95-file-button:hover {
@@ -2695,7 +2784,7 @@ button.terminal-action {
   bottom: 58px;
   left: 12px;
   display: grid;
-  height: 326px;
+  height: 410px;
   grid-template-rows: auto minmax(0, 1fr) auto;
   overflow: hidden;
   border: 1px solid rgba(255, 111, 199, 0.58);
@@ -2858,7 +2947,7 @@ button.terminal-action {
 .k95-terminal-main {
   display: grid;
   min-height: 0;
-  grid-template-columns: minmax(0, 1fr) 260px;
+  grid-template-columns: minmax(0, 1fr) 300px;
 }
 
 .k95-terminal-dock .mirror-terminal-output {
@@ -2873,12 +2962,12 @@ button.terminal-action {
 }
 
 .k95-terminal-dock .mirror-terminal-entry {
-  padding: 8px 12px;
+  padding: 10px 14px;
 }
 
 .k95-terminal-dock .mirror-terminal-entry > b {
   padding-right: 76px;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .k95-terminal-dock .mirror-terminal-entry > span {
@@ -2888,10 +2977,10 @@ button.terminal-action {
 }
 
 .k95-terminal-dock .mirror-terminal-entry pre {
-  margin-top: 4px;
+  margin-top: 6px;
   color: #ffd1eb;
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: 15px;
+  line-height: 1.58;
 }
 
 .k95-terminal-dock .mirror-terminal-cursor {
@@ -2938,13 +3027,13 @@ button.terminal-action {
 .k95-terminal-actions button,
 .k95-terminal-command button {
   min-width: 0 !important;
-  min-height: 29px !important;
-  padding: 5px 7px !important;
+  min-height: 34px !important;
+  padding: 7px 8px !important;
   border: 1px solid rgba(255, 104, 191, 0.42) !important;
   border-radius: 8px !important;
   background: linear-gradient(180deg, rgba(76, 27, 67, 0.68), rgba(34, 10, 29, 0.74)) !important;
   color: #ff9ed7 !important;
-  font: 800 10px/1.2 "JetBrains Mono", "Lucida Console", monospace !important;
+  font: 800 11px/1.25 "JetBrains Mono", "Lucida Console", monospace !important;
   letter-spacing: 0.04em;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.07),
@@ -2985,7 +3074,7 @@ button.terminal-action {
 
 .k95-terminal-command {
   display: grid;
-  min-height: 44px;
+  min-height: 54px;
   grid-template-columns: auto minmax(0, 1fr) 92px;
   gap: 9px;
   align-items: center;
@@ -2996,22 +3085,22 @@ button.terminal-action {
 
 .k95-terminal-command > span {
   color: #55f5ff;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 800;
 }
 
 .k95-terminal-command input {
   width: 100%;
   min-width: 0;
-  height: 31px;
-  padding: 5px 9px;
+  height: 38px;
+  padding: 7px 10px;
   border: 1px solid rgba(255, 111, 199, 0.52);
   border-radius: 9px;
   outline: none;
   background: rgba(0, 0, 0, 0.48);
   color: #ffc9e9;
   caret-color: #55f5ff;
-  font: 13px/1.4 "JetBrains Mono", "Lucida Console", monospace;
+  font: 15px/1.4 "JetBrains Mono", "Lucida Console", monospace;
 }
 
 .k95-terminal-command input:focus {
@@ -3020,7 +3109,7 @@ button.terminal-action {
 }
 
 .k95-terminal-command button {
-  height: 31px !important;
+  height: 38px !important;
   border-radius: 9px !important;
   background: linear-gradient(110deg, #d80d83, #8d2ce2) !important;
   color: #fff !important;
@@ -3030,6 +3119,7 @@ button.terminal-action {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 11px;
+  padding: 4px;
 }
 
 .k95-judgment-form label,
@@ -3059,25 +3149,66 @@ button.terminal-action {
 
 .k95-judgment-form fieldset {
   grid-column: 1 / -1;
-  max-height: 145px;
+  max-height: 235px;
   margin: 0;
   overflow: auto;
   border: 2px groove #eee;
+  background: #f4f4f4;
 }
 
 .k95-evidence-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 5px 12px;
+  gap: 7px 12px;
+  padding: 4px;
 }
 
 .k95-evidence-option {
   display: flex;
-  gap: 7px;
+  min-height: 49px;
+  gap: 9px;
   align-items: center;
+  padding: 7px 9px;
+  border: 1px solid #777;
+  background: #fff;
   color: #111 !important;
-  font-size: 12px !important;
-  font-weight: 500 !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  cursor: pointer;
+}
+
+.k95-evidence-option:hover,
+.k95-evidence-option:focus-within {
+  border-color: #000080;
+  background: #e9efff;
+}
+
+.k95-evidence-option input {
+  flex: 0 0 auto;
+  width: 18px !important;
+  height: 18px !important;
+  margin: 0 !important;
+  accent-color: #000080;
+}
+
+.k95-evidence-name {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+  color: #111 !important;
+}
+
+.k95-evidence-name b {
+  overflow-wrap: anywhere;
+  color: #111 !important;
+  font-size: 14px !important;
+  line-height: 1.25;
+}
+
+.k95-evidence-name small {
+  color: #555 !important;
+  font-size: 10px !important;
+  line-height: 1.25;
 }
 
 .k95-submit-judgment {
@@ -3091,25 +3222,121 @@ button.terminal-action {
 }
 
 .k95-ending-screen {
-  padding: 18px;
-  border: 2px inset #eee;
-  background: #fff;
+  position: relative;
+  overflow: hidden;
+  padding: 24px;
+  border: 3px double #55f5ff;
+  background:
+    linear-gradient(135deg, rgba(255, 45, 166, 0.12), transparent 42%),
+    #04040b;
+  color: #f7f4f8;
+  box-shadow: inset 0 0 45px rgba(85, 245, 255, 0.08);
 }
 
 .k95-ending-screen small {
-  color: #000080;
+  color: #55f5ff;
+  font: 800 11px/1.3 "Lucida Console", monospace;
+  letter-spacing: 0.12em;
 }
 
 .k95-ending-screen h3 {
-  color: #000080;
-  font-size: 24px;
+  margin: 20px 0 14px;
+  color: #ff58b9;
+  font: 900 clamp(25px, 3vw, 40px)/1.08 "Lucida Console", monospace;
+  text-shadow: 0 0 15px rgba(255, 45, 166, 0.55);
+}
+
+.k95-ending-screen p {
+  color: #f7f4f8 !important;
+  font: 15px/1.68 "Lucida Console", monospace !important;
+}
+
+.k95-ending-stamp {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(85, 245, 255, 0.45);
+}
+
+.k95-ending-stamp span {
+  padding: 7px 10px;
+  border: 1px solid #55f5ff;
+  color: #55f5ff;
+  font: 900 13px/1 "Lucida Console", monospace;
+  letter-spacing: 0.14em;
+}
+
+.k95-ending-stamp b {
+  color: #fff;
+  font: 800 13px/1.3 "Lucida Console", monospace;
+}
+
+.k95-ending-decision,
+.k95-ending-screen section,
+.k95-ending-screen blockquote {
+  margin: 12px 0;
+  padding: 13px 15px;
+  border-left: 4px solid #ff58b9;
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.k95-ending-decision {
+  display: grid;
+  gap: 5px;
+}
+
+.k95-ending-decision strong {
+  color: #fff;
+  font: 900 20px/1.2 "Lucida Console", monospace;
+}
+
+.k95-ending-screen section {
+  border-color: #55f5ff;
+}
+
+.k95-ending-screen blockquote {
+  border-color: #fff;
+  background: rgba(255, 45, 166, 0.08);
+}
+
+.k95-ending-screen details {
+  margin-top: 15px;
+  border: 1px solid rgba(85, 245, 255, 0.4);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.k95-ending-screen summary {
+  padding: 10px 12px;
+  color: #55f5ff;
+  font: 800 12px/1.3 "Lucida Console", monospace;
+  cursor: pointer;
 }
 
 .k95-ending-screen li {
   display: flex;
   justify-content: space-between;
   padding: 6px 0;
-  border-bottom: 1px dotted #777;
+  border-bottom: 1px dotted rgba(255, 255, 255, 0.25);
+}
+
+.k95-ending-footer {
+  margin: 18px -24px -24px;
+  padding: 12px;
+  background: #55f5ff;
+  color: #02030a;
+  font: 900 12px/1.2 "Lucida Console", monospace;
+  letter-spacing: 0.12em;
+  text-align: center;
+}
+
+.k95-judgment-window {
+  top: 4%;
+  left: 16%;
+  width: 70%;
+  min-width: 720px;
+  max-height: 92%;
 }
 
 .k95-taskbar {
@@ -3847,8 +4074,8 @@ button.terminal-action {
   }
 
   .kernel95-desktop {
-    height: 920px;
-    min-height: 920px;
+    height: 1000px;
+    min-height: 1000px;
   }
 
   .k95-main-window {
@@ -3980,7 +4207,7 @@ button.terminal-action {
   }
 
   .k95-terminal-dock {
-    height: 380px;
+    height: 420px;
   }
 
   .k95-terminal-dock > header {
@@ -4001,7 +4228,7 @@ button.terminal-action {
   }
 
   .k95-terminal-main {
-    grid-template-columns: minmax(0, 1fr) 150px;
+    grid-template-columns: minmax(0, 1fr) 180px;
   }
 
   .k95-terminal-actions {
@@ -4018,6 +4245,13 @@ button.terminal-action {
 
   .k95-judgment-form {
     grid-template-columns: 1fr;
+  }
+
+  .k95-judgment-window,
+  .k95-document-window {
+    left: 12%;
+    width: 76%;
+    min-width: 0;
   }
 
   .k95-judgment-form fieldset,

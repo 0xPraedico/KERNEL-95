@@ -74,7 +74,8 @@ def submit_judgment_event(payload: str, state: GameState) -> tuple[GameState, st
     state.current_mirror_message = result.narration
     state.selected_os_object = "final_judgment"
     state.terminal_history.append(
-        f"FINAL JUDGMENT\n{result.title} // {result.narration}"
+        f"FINAL JUDGMENT // {result.decision}\n{result.title} // "
+        f"{result.narration}\nCONSEQUENCE: {result.consequence}"
     )
     state.terminal_history = state.terminal_history[-16:]
     return _snapshot(state)

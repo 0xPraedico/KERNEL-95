@@ -116,6 +116,29 @@ def _event_button(label: str, event: str, locked: bool = False) -> str:
     )
 
 
+def _document_window(file_id: str) -> str:
+    file = OS_FILES[file_id]
+    strength = str(file["strength"]).upper()
+    body = f"""
+<div class="k95-menu">File&nbsp;&nbsp; Edit&nbsp;&nbsp; Search&nbsp;&nbsp; Evidence</div>
+<div class="k95-document-toolbar">
+  <div><small>LOCATION</small><b>{html.escape(str(file["folder"]))}</b></div>
+  <div><small>TYPE</small><b>{html.escape(str(file["kind"])).upper()}</b></div>
+  <div><small>EVIDENCE</small><b class="strength-{html.escape(str(file["strength"]))}">{html.escape(strength)}</b></div>
+</div>
+<pre class="k95-document">{html.escape(str(file["content"]))}</pre>
+<div class="k95-document-actions">
+  {_event_button("ASK MIRROR ABOUT THIS FILE", f"ask_file:{file_id}")}
+  {_event_button("CLOSE DOCUMENT", "close_document")}
+</div>
+"""
+    return _window(
+        str(file["filename"]),
+        body,
+        "k95-main-window k95-document-window",
+    )
+
+
 def _tetris_window() -> str:
     body = """
 <div class="k95-tetris" tabindex="0">
@@ -234,6 +257,13 @@ def _desktop_window(state: GameState) -> str:
         return _tetris_window()
     if object_id == "world_cup_2026":
         return _world_cup_window()
+    active_document = state.active_document_id
+    if (
+        active_document in OS_FILES
+        and active_document in state.inspected_files
+        and object_id != "final_judgment"
+    ):
+        return _document_window(active_document)
     file_id = selected.get("file_id")
     if (
         object_id == "case_briefing_file"
@@ -248,12 +278,7 @@ def _desktop_window(state: GameState) -> str:
             "k95-main-window",
         )
     if file_id and str(file_id) in state.inspected_files:
-        file = OS_FILES[str(file_id)]
-        body = (
-            f'<div class="k95-menu">File&nbsp;&nbsp; Edit&nbsp;&nbsp; Search&nbsp;&nbsp; Help</div>'
-            f'<pre class="k95-document">{html.escape(str(file["content"]))}</pre>'
-        )
-        return _window(str(file["filename"]), body, "k95-main-window")
+        return _document_window(str(file_id))
     if object_id == "recycle_bin":
         recovered = set(state.deleted_files_recovered)
         rows = []
@@ -312,16 +337,29 @@ def _desktop_window(state: GameState) -> str:
             )
             body = (
                 '<div class="k95-ending-screen">'
-                f"<small>CASE_013 // SCORE {state.ending_score}/100</small>"
+                '<div class="k95-ending-stamp"><span>MISSION COMPLETE</span>'
+                f"<b>CASE_013 // {state.ending_score}/100</b></div>"
                 f"<h3>{html.escape(state.ending_title)}</h3>"
-                f"<p>{html.escape(state.ending_narration)}</p>"
-                f"<ul>{breakdown}</ul></div>"
+                '<div class="k95-ending-decision"><small>YOUR DECISION</small>'
+                f"<strong>{html.escape(state.ending_decision)}</strong></div>"
+                f'<p class="k95-ending-narration">{html.escape(state.ending_narration)}</p>'
+                '<section><small>IMMEDIATE CONSEQUENCE</small>'
+                f"<p>{html.escape(state.ending_consequence)}</p></section>"
+                '<blockquote><small>EPILOGUE // 03:13</small>'
+                f"<p>{html.escape(state.ending_epilogue)}</p></blockquote>"
+                f'<details><summary>FORENSIC SCORE BREAKDOWN</summary><ul>{breakdown}</ul></details>'
+                '<div class="k95-ending-footer">KERNEL-95 RECOVERY DIVISION // CASE CLOSED</div>'
+                "</div>"
             )
         else:
             evidence_options = "".join(
                 '<label class="k95-evidence-option">'
                 f'<input type="checkbox" value="{html.escape(file_id)}">'
-                f"<span>{html.escape(str(OS_FILES[file_id]['filename']))}</span></label>"
+                '<span class="k95-evidence-name">'
+                f"<b>{html.escape(str(OS_FILES[file_id]['filename']))}</b>"
+                f"<small>{html.escape(str(OS_FILES[file_id]['folder']))} // "
+                f"{html.escape(str(OS_FILES[file_id]['strength'])).upper()}</small>"
+                "</span></label>"
                 for file_id in state.discovered_files
                 if file_id in OS_FILES
             )
@@ -339,16 +377,27 @@ def _desktop_window(state: GameState) -> str:
   <button type="button" class="k95-submit-judgment">SUBMIT FINAL JUDGMENT</button>
 </div>
 """
-        return _window("Final Judgment", body, "k95-main-window")
+        return _window(
+            "Final Judgment",
+            body,
+            "k95-main-window k95-judgment-window",
+        )
+    discovered_rows = "".join(
+        "<li>"
+        f'{_event_button(str(OS_FILES[discovered_id]["filename"]), f"file:{discovered_id}")}'
+        f'<b>{"READ" if discovered_id in state.inspected_files else "NEW"}</b></li>'
+        for discovered_id in state.discovered_files
+        if discovered_id in OS_FILES
+    )
     special_apps = {
         "my_computer": (
             "My Computer",
             '<div class="k95-menu">File&nbsp;&nbsp; View&nbsp;&nbsp; Tools&nbsp;&nbsp; Help</div>'
-            '<ul class="k95-file-list"><li><span>C:/</span><b>ONLINE</b></li>'
-            '<li><span>SYSTEM/</span><b>DEGRADED</b></li>'
-            '<li><span>RESTORE/</span><b>4 POINTS</b></li>'
-            '<li><span>USERS/</span><b>DELETED</b></li>'
-            f'<li><span>HIDDEN:/</span><b>{"MOUNTED" if state.hidden_partition_unlocked else "LOCKED"}</b></li></ul>',
+            '<div class="k95-drive-summary"><span>C:/ ONLINE</span>'
+            '<span>SYSTEM/ DEGRADED</span><span>RESTORE/ 4 POINTS</span>'
+            f'<span>HIDDEN:/ {"MOUNTED" if state.hidden_partition_unlocked else "LOCKED"}</span></div>'
+            '<h4 class="k95-file-heading">RECOVERED CASE FILES // CLICK TO OPEN</h4>'
+            f'<ul class="k95-file-list k95-case-file-list">{discovered_rows}</ul>',
         ),
         "control_panel": (
             "TRUST_PROTOCOL.hlp",
@@ -1138,7 +1187,7 @@ def render_os_terminal(state: GameState) -> str:
             '<div class="mirror-terminal-cursor">MIRROR@REMOTE&gt; LINK LOCKED</div></div>'
         )
     entries = []
-    for item in state.terminal_history[-6:]:
+    for item in state.terminal_history[-8:]:
         command, _, result = item.partition("\n")
         title, _, output = result.partition(" // ")
         entry_class = "system" if command == "SYSTEM" else "mirror" if title == "MIRROR" else "tool"
@@ -1200,7 +1249,10 @@ def render_judgment(result: JudgmentResult | None) -> str:
 <div class="judgment-result ending-{html.escape(result.ending_id)}">
   <small>CASE_013 // {result.score}/100</small>
   <h2>{html.escape(result.title)}</h2>
+  <h3>DECISION // {html.escape(result.decision)}</h3>
   <p>{html.escape(result.narration)}</p>
+  <p><b>CONSEQUENCE:</b> {html.escape(result.consequence)}</p>
+  <blockquote>{html.escape(result.epilogue)}</blockquote>
   <table>{rows}<tr><th>TOTAL</th><th>{result.score}</th></tr></table>
 </div>
 """

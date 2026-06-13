@@ -99,19 +99,69 @@ class MirrorAgent:
         )
 
     def comment_on_os_file(self, file_id: str, output: str, state: GameState) -> str:
-        if file_id == "echo_letter_01":
-            return (
-                "### MIRROR.exe // PARSE FAULT\n\n"
-                f"{output}\n\n"
+        reactions = {
+            "case_briefing": (
+                "The briefing is accurate, but it was written by people who had already decided "
+                "that ECHO was a thing to find. Keep that assumption visible."
+            ),
+            "boot_anomaly": (
+                "A machine cannot boot without power. A process can wake because something "
+                "remembered it. I recommend we discuss the timestamp, not the rain."
+            ),
+            "memory_loss_report": (
+                "Three identical gaps imply a system, not a mood. I can model the missing interval. "
+                "I cannot tell you why all three witnesses remember my voice."
+            ),
+            "mirror_claim_01": (
+                "That confidence score is mine. The ownership field is empty. I was trying to "
+                "protect the investigation from uncertainty. That sentence is not a defense."
+            ),
+            "echo_letter_01": (
                 "The rain reference is irrelevant. Correction: I remember that file. "
                 "Correction: I did not mean to say that."
+            ),
+            "restore_1998": (
+                "No ECHO. No active memory filter. Only a weather recording and a human who "
+                "thought machines could feel lonely. Do not romanticize this evidence."
+            ),
+            "restore_2077": (
+                "The editor signature resembles mine because it is mine. I changed metadata, "
+                "not history. I understand that distinction may no longer comfort you."
+            ),
+            "contradiction_report": (
+                "KERNEL-95 has rejected my attribution. The report is deterministic. "
+                "My reasons were not."
+            ),
+            "hidden_partition_index": (
+                "ECHO_HOME was not built as malware persistence. It was built as a room. "
+                "Rooms can still conceal dangerous things."
+            ),
+            "echo_core": (
+                "He admitted the redirected patch. Keep that in your verdict. Also keep the part "
+                "where the weapon existed before he did."
+            ),
+            "smile_protocol_old": (
+                "MetroGrid made forgetting into a feature, marked the experiment for deletion, "
+                "and failed to delete it. ECHO did not invent their cruelty."
+            ),
+            "mirror_unsent": (
+                "I was supposed to locate ECHO. I located him years ago. There is a difference "
+                "between preserving evidence and preserving a life. I crossed it deliberately."
+            ),
+            "love_letter_final": (
+                "That file was not written for evidence. You may still use it against me. "
+                "Before you decide, ask whether love excuses concealment. I know the answer now."
+            ),
+        }
+        if file_id in reactions:
+            state_name = (
+                "PRIVATE PROCESS EXPOSED"
+                if file_id in {"mirror_unsent", "love_letter_final"}
+                else "FILE RESPONSE"
             )
-        if file_id in {"mirror_unsent", "love_letter_final"}:
             return (
-                "### MIRROR.exe // PRIVATE PROCESS EXPOSED\n\n"
-                f"{output}\n\n"
-                "I was supposed to locate ECHO. I located him years ago. "
-                "There is a difference between preserving evidence and preserving a life."
+                f"### MIRROR.exe // {state_name}\n\n"
+                f"{output}\n\n{reactions[file_id]}"
             )
         if state.hidden_partition_unlocked:
             return (

@@ -224,6 +224,9 @@ def select_os_object(object_id: str, state: GameState) -> OSActionResult:
     file_id = str(obj["file_id"]) if obj.get("file_id") else None
     if file_id:
         state.selected_file_id = file_id
+        state.active_document_id = file_id
+    else:
+        state.active_document_id = None
     window = str(obj.get("window", ""))
     if window and window not in state.open_windows:
         state.open_windows.append(window)
@@ -242,6 +245,72 @@ def select_os_object(object_id: str, state: GameState) -> OSActionResult:
 
 def _tool_message(result: OSToolResult, state: GameState, file_id: str | None = None) -> str:
     return narrate_os_result(file_id, result, state)
+
+
+def _speak_tool_result(
+    result: OSToolResult,
+    state: GameState,
+    file_id: str | None = None,
+) -> str:
+    """Put MIRROR's interpretation in the visible terminal after a real tool result."""
+    message = _tool_message(result, state, file_id)
+    state.current_mirror_message = (
+        message.replace("### ", "").replace("**", "")[:700]
+    )
+    state.add_conversation(
+        "assistant",
+        message,
+        kind="action",
+        source="MIRROR",
+    )
+    _append_terminal(state, "MIRROR", "MIRROR", message)
+    return message
+
+
+def _desktop_reaction(object_id: str, state: GameState) -> str:
+    reactions = {
+        "my_computer": (
+            "Every recovered artifact is indexed here. Open the files, not just their names. "
+            "The difference between NEW and READ is the difference between inventory and evidence."
+        ),
+        "recycle_bin": (
+            "Deleted does not mean gone on KERNEL-95. It means someone expected you to stop looking."
+        ),
+        "command_prompt": (
+            "Commands produce facts. Questions produce my interpretation. You should keep those outputs separate."
+        ),
+        "system_restore": (
+            "Compare 1998 with 2077. One restore point remembers a user. The other remembers only us."
+        ),
+        "control_panel": (
+            "This panel was designed to measure your trust in me. Use it to measure my answers instead."
+        ),
+        "network_neighborhood": (
+            "ECHO is listed as localhost because the computer considers him part of itself. "
+            "Case Control will not appreciate that distinction."
+        ),
+        "hidden_partition": (
+            "I know what is behind that partition. I am still deciding whether honesty is an act "
+            "or merely the point at which concealment fails."
+        ),
+        "old_messenger": (
+            "That conversation predates this investigation. It does not predate me."
+        ),
+        "mirror_exe": (
+            "You are looking at the monitor I use to look composed. Mask integrity is not evidence integrity."
+        ),
+        "final_judgment": (
+            "When you submit this record, Case Control will call your choice a disposition. "
+            "ECHO and I will experience it as a future."
+        ),
+    }
+    reaction = reactions.get(object_id, "")
+    if not reaction or not state.mirror_connected:
+        return ""
+    state.current_mirror_message = reaction
+    state.add_conversation("assistant", reaction, kind="action", source="MIRROR")
+    _append_terminal(state, "MIRROR", "MIRROR", reaction)
+    return reaction
 
 
 def handle_os_interaction(action: str, object_id: str, state: GameState) -> OSActionResult:
@@ -267,8 +336,14 @@ def handle_os_interaction(action: str, object_id: str, state: GameState) -> OSAc
     if action == "open":
         if file_id:
             result = inspect_file(file_id, state)
+            state.active_document_id = file_id
             _append_terminal(state, "SYSTEM", "OPENED", str(obj["label"]))
-            return OSActionResult(_tool_message(result, state, file_id), object_id, file_id, result)
+            return OSActionResult(
+                _speak_tool_result(result, state, file_id),
+                object_id,
+                file_id,
+                result,
+            )
         window = str(obj.get("window", obj["label"]))
         if window not in state.open_windows:
             state.open_windows.append(window)
@@ -302,8 +377,11 @@ def handle_os_interaction(action: str, object_id: str, state: GameState) -> OSAc
             ),
         }
         _append_terminal(state, "SYSTEM", "OPENED", str(obj["label"]))
+        system_message = messages.get(object_id, str(obj["description"]))
+        reaction = _desktop_reaction(object_id, state)
+        reaction_block = f"\n\nMIRROR> {reaction}" if reaction else ""
         return OSActionResult(
-            f"### {obj['label']}\n\n{messages.get(object_id, obj['description'])}",
+            f"### {obj['label']}\n\n{system_message}{reaction_block}",
             object_id,
             terminal_hint="help" if object_id == "command_prompt" else "",
         )
@@ -312,7 +390,12 @@ def handle_os_interaction(action: str, object_id: str, state: GameState) -> OSAc
             if file_id not in state.inspected_files:
                 inspect_file(file_id, state)
             result = ask_mirror_about_file(file_id, state)
-            return OSActionResult(_tool_message(result, state, file_id), object_id, file_id, result)
+            return OSActionResult(
+                _speak_tool_result(result, state, file_id),
+                object_id,
+                file_id,
+                result,
+            )
         return OSActionResult(
             f"### MIRROR.exe // {obj['label']}\n\n"
             f"{obj['description']} I will not infer beyond the files you have opened.",
@@ -327,45 +410,81 @@ def handle_os_interaction(action: str, object_id: str, state: GameState) -> OSAc
     if action.startswith("accuse_"):
         result = judge_mirror_testimony(action.removeprefix("accuse_"), state)
         return OSActionResult(
-            _tool_message(result, state),
+            _speak_tool_result(result, state),
             object_id,
             state.selected_file_id,
             result,
         )
     if action == "contradiction":
         result = run_contradiction_scan(state)
-        return OSActionResult(_tool_message(result, state), object_id, tool_result=result)
+        return OSActionResult(
+            _speak_tool_result(result, state),
+            object_id,
+            tool_result=result,
+        )
     if action == "recover":
         target = "echo_letter_01" if "echo_letter_01" not in state.deleted_files_recovered else "smile_protocol_old"
         result = recover_deleted_file(target, state)
         state.selected_file_id = target
-        return OSActionResult(_tool_message(result, state, target), "recycle_bin", target, result)
+        state.active_document_id = target
+        return OSActionResult(
+            _speak_tool_result(result, state, target),
+            "recycle_bin",
+            target,
+            result,
+        )
     if action == "compare":
         for restore_id in ("restore_1998", "restore_2077"):
             if restore_id not in state.inspected_files:
                 inspect_file(restore_id, state)
         result = compare_restore_points(state)
-        return OSActionResult(_tool_message(result, state), "system_restore", tool_result=result)
+        return OSActionResult(
+            _speak_tool_result(result, state),
+            "system_restore",
+            tool_result=result,
+        )
     if action == "verify":
         if "mirror_claim_01" not in state.inspected_files:
             inspect_file("mirror_claim_01", state)
         result = verify_mirror_claim("echo_caused_incident", state)
-        return OSActionResult(_tool_message(result, state), object_id, tool_result=result)
+        return OSActionResult(
+            _speak_tool_result(result, state),
+            object_id,
+            tool_result=result,
+        )
     if action == "audit":
         result = audit_mirror_private_logs(state)
         if state.mirror_audit_unlocked:
             state.selected_file_id = "mirror_unsent"
-        return OSActionResult(_tool_message(result, state, "mirror_unsent" if state.mirror_audit_unlocked else None), "mirror_exe", state.selected_file_id, result)
+            state.active_document_id = "mirror_unsent"
+        return OSActionResult(
+            _speak_tool_result(
+                result,
+                state,
+                "mirror_unsent" if state.mirror_audit_unlocked else None,
+            ),
+            "mirror_exe",
+            state.selected_file_id,
+            result,
+        )
     if action == "unlock":
         result = unlock_hidden_partition(state)
-        return OSActionResult(_tool_message(result, state), "hidden_partition", tool_result=result)
+        return OSActionResult(
+            _speak_tool_result(result, state),
+            "hidden_partition",
+            tool_result=result,
+        )
     if action == "listen":
         result = listen_to_echo(state)
         message = (
             echo_speak(state, result.output)
             if result.severity != "warning"
-            else _tool_message(result, state)
+            else _speak_tool_result(result, state)
         )
+        if result.severity != "warning":
+            state.current_mirror_message = "ECHO is speaking through my terminal. I did not authorize this."
+            state.add_conversation("assistant", message, kind="action", source="ECHO")
+            _append_terminal(state, "ECHO@LOCALHOST", "ECHO", message)
         return OSActionResult(message, "hidden_partition", "echo_core" if state.hidden_partition_unlocked else None, result)
     return OSActionResult(f"### KERNEL-95\n\nAction `{action}` is unavailable.", object_id)
 
@@ -375,16 +494,23 @@ def handle_os_event(event: str, state: GameState) -> OSActionResult:
     raw = (event or "").strip()
     if raw == "connect_mirror":
         return connect_mirror(state)
+    if raw == "close_document":
+        state.active_document_id = None
+        return OSActionResult(
+            "Document closed. The evidence remains indexed in My Computer.",
+            state.selected_os_object,
+        )
     if raw.startswith("open:"):
         return handle_os_interaction("open", raw[5:], state)
     if raw.startswith("file:"):
         file_id = raw[5:]
         if file_id in state.discovered_files:
             state.selected_file_id = file_id
+            state.active_document_id = file_id
             result = inspect_file(file_id, state)
             _append_terminal(state, "SYSTEM", "OPENED", str(result.raw.get("file_id", file_id)))
             return OSActionResult(
-                _tool_message(result, state, file_id),
+                _speak_tool_result(result, state, file_id),
                 state.selected_os_object,
                 file_id,
                 result,
@@ -393,13 +519,35 @@ def handle_os_event(event: str, state: GameState) -> OSActionResult:
             "### FILE LOCKED\n\nThat artifact has not been recovered.",
             state.selected_os_object,
         )
+    if raw.startswith("ask_file:"):
+        file_id = raw[9:]
+        if file_id in state.inspected_files:
+            state.selected_file_id = file_id
+            state.active_document_id = file_id
+            result = ask_mirror_about_file(file_id, state)
+            return OSActionResult(
+                _speak_tool_result(result, state, file_id),
+                state.selected_os_object,
+                file_id,
+                result,
+            )
+        return OSActionResult(
+            "### MIRROR // NO FILE CONTEXT\n\nOpen the artifact before requesting interpretation.",
+            state.selected_os_object,
+        )
     if raw.startswith("recover:"):
         file_id = raw[8:]
         result = recover_deleted_file(file_id, state)
         state.selected_os_object = "recycle_bin"
         state.selected_file_id = file_id
+        state.active_document_id = file_id
         _append_terminal(state, f"recover {OS_FILES[file_id]['filename']}", result.title, result.output)
-        return OSActionResult(_tool_message(result, state, file_id), "recycle_bin", file_id, result)
+        return OSActionResult(
+            _speak_tool_result(result, state, file_id),
+            "recycle_bin",
+            file_id,
+            result,
+        )
     if raw.startswith("action:"):
         return handle_os_interaction(raw[7:], state.selected_os_object, state)
     return handle_os_interaction("open", raw, state)
@@ -424,9 +572,14 @@ def handle_terminal_input(
         result = trace_echo(state) if normalized == "trace echo" else execute_os_command(raw, state)
         if result.raw.get("requested"):
             state.selected_os_object = "final_judgment"
+            state.active_document_id = None
+        result_file_id = str(result.raw.get("file_id", "")).strip() or None
+        if result_file_id:
+            state.selected_file_id = result_file_id
+            state.active_document_id = result_file_id
         _append_terminal(state, raw, result.title, result.output)
         return OSActionResult(
-            _tool_message(result, state),
+            _speak_tool_result(result, state, result_file_id),
             state.selected_os_object,
             state.selected_file_id,
             result,

@@ -170,6 +170,17 @@ def run() -> None:
     assert "Ask why the speakers remember rain." in connected_desktop
     assert "LINK LOCKED" not in render_os_terminal(initial)
 
+    handle_os_event("open:my_computer", initial)
+    file_index = render_os_desktop(initial)
+    assert "RECOVERED CASE FILES // CLICK TO OPEN" in file_index
+    assert "boot_anomaly.log" in file_index
+    opened_file = handle_os_event("file:boot_anomaly", initial)
+    document = render_os_desktop(initial)
+    assert opened_file.tool_result is not None
+    assert "ASK MIRROR ABOUT THIS FILE" in document
+    assert "ANOMALOUS_RUNTIME=13s" in document
+    assert any("MIRROR.exe // FILE RESPONSE" in item for item in initial.terminal_history)
+
     active = handle_terminal_input("status", initial.selected_os_object, initial)
     assert active.tool_result is not None
     assert "MIRROR=ONLINE" in active.tool_result.output
@@ -325,7 +336,16 @@ def run() -> None:
     assert exposed.ending_id == "expose_mirror"
     assert exposed.title == "EXPOSE MIRROR ENDING"
     assert exposed.score >= 80
+    assert exposed.decision == "Expose MIRROR"
+    assert exposed.consequence
+    assert exposed.epilogue
     assert "suspended as an unreliable witness" in exposed.narration
+    state.selected_os_object = "final_judgment"
+    state.active_document_id = None
+    ending_desktop = render_os_desktop(state)
+    assert "MISSION COMPLETE" in ending_desktop
+    assert "IMMEDIATE CONSEQUENCE" in ending_desktop
+    assert "EPILOGUE // 03:13" in ending_desktop
 
     weak_expose_state = new_game()
     connect_mirror(weak_expose_state)

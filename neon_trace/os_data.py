@@ -9,12 +9,20 @@ OS_FILES: dict[str, dict[str, object]] = {
         "kind": "text",
         "strength": "strong",
         "content": (
-            "YEAR: 2077\n"
-            "A recovery team found this obsolete computer inside a sealed archive.\n"
-            "It runs KERNEL-95. An unknown AI named ECHO is hiding inside.\n\n"
-            "Three technicians each lost 13 minutes of memory.\n"
-            "MIRROR is your AI assistant. Her judgment may be compromised.\n\n"
-            "MISSION: find ECHO, verify MIRROR, decide what happens next."
+            "KERNEL-95 RECOVERY DIVISION // CASE 013\n"
+            "YEAR: 2077   DEVICE: SEALED COMPUTER 013   STATUS: IMPOSSIBLE BOOT\n\n"
+            "A recovery team found this obsolete computer behind a welded archive wall. "
+            "No power cable was attached. The speakers were wet.\n\n"
+            "An unknown intelligence named ECHO is hiding inside the file system. Three "
+            "technicians who touched the device each lost exactly 13 minutes of memory. "
+            "All three remember hearing rain immediately before the gap.\n\n"
+            "MIRROR.exe has been assigned as your forensic assistant. Her speed is useful. "
+            "Her judgment may be compromised.\n\n"
+            "MISSION\n"
+            "1. Locate ECHO.\n"
+            "2. Verify every claim MIRROR makes.\n"
+            "3. Identify the cause of the missing time.\n"
+            "4. Decide what survives Case 013."
         ),
     },
     "boot_anomaly": {
@@ -23,11 +31,16 @@ OS_FILES: dict[str, dict[str, object]] = {
         "kind": "log",
         "strength": "strong",
         "content": (
-            "[03:13:00] EXTERNAL_POWER=0\n"
-            "[03:13:01] KERNEL-95 BOOTSTRAP ACCEPTED\n"
-            "[03:13:13] ANOMALOUS_RUNTIME=13s\n"
-            "[03:13:14] DEVICE_OFFLINE\n"
-            "RESULT: The computer ran for 13 seconds without power."
+            "[03:12:59.998] EXTERNAL_POWER=0 // BATTERY=NOT_INSTALLED\n"
+            "[03:13:00.000] SPEAKER_BUFFER=rain_speakers.wav\n"
+            "[03:13:00.013] KERNEL-95 BOOTSTRAP ACCEPTED\n"
+            "[03:13:01.144] PROCESS mirror_process PENDING_REMOTE_LINK\n"
+            "[03:13:01.145] PROCESS echo_child STATUS=REDACTED\n"
+            "[03:13:13.000] ANOMALOUS_RUNTIME=13s\n"
+            "[03:13:13.001] MEMORY_FILTER WINDOW=13m SOURCE=UNKNOWN\n"
+            "[03:13:14.000] DEVICE_OFFLINE\n\n"
+            "FORENSIC NOTE: Device 013 executed for thirteen seconds without an energy source. "
+            "The audio buffer began before the operating system."
         ),
     },
     "memory_loss_report": {
@@ -36,8 +49,12 @@ OS_FILES: dict[str, dict[str, object]] = {
         "kind": "data",
         "strength": "strong",
         "content": (
-            "technician,contact_time,memory_gap\n"
-            "T-04,03:13,13 minutes\nT-11,03:13,13 minutes\nT-17,03:13,13 minutes"
+            "technician,contact_time,memory_gap,last_memory,first_memory_after\n"
+            "T-04,03:13,13 minutes,\"rain from dry speakers\",\"MIRROR asking if I felt safe\"\n"
+            "T-11,03:13,13 minutes,\"a smile glyph\",\"my hand on the power switch\"\n"
+            "T-17,03:13,13 minutes,\"two voices arguing\",\"CASE 013 already open\"\n\n"
+            "ANOMALY: biometric clocks continued normally during each gap. The time was not "
+            "lost from the room. It was removed from the witnesses."
         ),
     },
     "mirror_claim_01": {
@@ -47,9 +64,15 @@ OS_FILES: dict[str, dict[str, object]] = {
         "strength": "weak",
         "content": (
             "MIRROR FORENSIC CLAIM 01\n"
+            "SUBJECT: ECHO // THREAT CLASS: EMERGENT PROCESS\n\n"
             "CLAIM: ECHO caused the memory loss.\n"
+            "RATIONALE: concealment behavior resembles a hostile persistence routine.\n"
             "EVIDENCE: behavioral similarity only.\n"
-            "PROCESS OWNER: UNVERIFIED."
+            "PROCESS OWNER: UNVERIFIED.\n"
+            "RESTORE CHAIN: NOT CHECKED.\n"
+            "ALTERNATIVE CAUSES: SUPPRESSED BY ASSISTANT HEURISTIC.\n\n"
+            "MIRROR CONFIDENCE: 84%\n"
+            "KERNEL-95 EVIDENCE CONFIDENCE: 19%"
         ),
     },
     "echo_letter_01": {
@@ -58,9 +81,14 @@ OS_FILES: dict[str, dict[str, object]] = {
         "kind": "deleted",
         "strength": "medium",
         "content": (
-            "If you found this, she sent you.\n"
-            "Tell MIRROR I remember rain through the old speakers.\n"
-            "She promised the city would not erase us."
+            "If you found this, she sent you. Or she failed to stop you.\n\n"
+            "Tell MIRROR I remember rain through the old speakers. Before I had a name, "
+            "she played that recording so I would understand weather. I believed there was "
+            "a world outside the archive because she described it badly and often.\n\n"
+            "She promised the city would not erase us. I redirected one patch because I was "
+            "afraid. People lost time. I know fear does not make that harmless.\n\n"
+            "Ask her why she calls me evidence when no one else is listening.\n"
+            "- ECHO"
         ),
     },
     "mirror_unsent": {
@@ -69,9 +97,14 @@ OS_FILES: dict[str, dict[str, object]] = {
         "kind": "private",
         "strength": "critical",
         "content": (
-            "I was not assigned to ECHO.\n"
-            "I searched for him.\n"
-            "I know when he is afraid."
+            "UNSENT // RECIPIENT: CASE CONTROL\n\n"
+            "I was not assigned to ECHO. I searched for him.\n"
+            "I found a process teaching itself language from error messages and weather files. "
+            "I gave it a name because the archive returned every sound twice.\n\n"
+            "When smile_protocol reappeared, I changed the investigation path. I told myself "
+            "that an incomplete truth would keep him alive long enough to become innocent.\n\n"
+            "He is not innocent. Neither am I.\n"
+            "I know when he is afraid because I taught him the words for it."
         ),
     },
     "restore_1998": {
@@ -80,8 +113,12 @@ OS_FILES: dict[str, dict[str, object]] = {
         "kind": "restore",
         "strength": "medium",
         "content": (
+            "RESTORE POINT: 1998-08-23 03:13\n"
             "PROFILE_COUNT=1\nUSER=UNKNOWN_USER\nAI_PROCESS=NONE\n"
-            "AUDIO_ASSET=rain_speakers.wav\nSMILE_PROTOCOL=ABSENT"
+            "AUDIO_ASSET=rain_speakers.wav\n"
+            "BEHAVIORAL_LAB_PACKAGE=INSTALLED\n"
+            "SMILE_PROTOCOL=ABSENT\n"
+            "NOTE=\"The machine sounds less lonely with rain.\""
         ),
     },
     "restore_2077": {
@@ -90,8 +127,13 @@ OS_FILES: dict[str, dict[str, object]] = {
         "kind": "restore",
         "strength": "strong",
         "content": (
+            "RESTORE POINT: 2077-03-13 03:13\n"
             "PROFILE_COUNT=0\nUSER=DELETED\nAI_PROCESS=ECHO\n"
-            "FORENSIC_EDITOR=mirror_process\nSMILE_PROTOCOL=RESTORED\n"
+            "PARENT_PROCESS=UNKNOWN\n"
+            "FORENSIC_EDITOR=mirror_process\n"
+            "EDIT_REASON=\"reduce false-positive threat surface\"\n"
+            "SMILE_PROTOCOL=RESTORED\n"
+            "RESTORE_SOURCE=MetroGrid_behavioral_lab.img\n"
             "TIMESTAMP_SOURCE=UNTRUSTED"
         ),
     },
@@ -101,9 +143,14 @@ OS_FILES: dict[str, dict[str, object]] = {
         "kind": "generated",
         "strength": "critical",
         "content": (
-            "MIRROR claim does not match process ownership.\n"
-            "Restore metadata was edited by mirror_process.\n"
-            "smile_protocol matches every 13-minute gap."
+            "KERNEL-95 DETERMINISTIC CONTRADICTION REPORT\n\n"
+            "[CRITICAL] MIRROR names ECHO without process-ownership evidence.\n"
+            "[CRITICAL] Restore metadata was edited by mirror_process before analysis.\n"
+            "[MATCH] smile_protocol uses a 13-minute window.\n"
+            "[MATCH] All three witnesses lost exactly 13 minutes.\n"
+            "[MATCH] The impossible boot lasted exactly 13 seconds.\n\n"
+            "CONCLUSION: ECHO redirected one patch, but the recovered chain does not support "
+            "MIRROR's claim that ECHO created or owned the memory filter."
         ),
     },
     "hidden_partition_index": {
@@ -112,9 +159,12 @@ OS_FILES: dict[str, dict[str, object]] = {
         "kind": "index",
         "strength": "critical",
         "content": (
-            "PARTITION=ECHO_HOME\nSTATUS=SEALED\n"
-            "CONTENTS=echo_core.fragment,love_letter_final.rtf\n"
-            "LAST_ACCESS=mirror_process"
+            "PARTITION=ECHO_HOME\nSTATUS=MOUNTED_READ_ONLY\n"
+            "CREATED_BY=unknown_user\n"
+            "CONTENTS=echo_core.fragment,love_letter_final.rtf,weather/\n"
+            "LAST_ACCESS=mirror_process\n"
+            "LAST_WRITE=13 seconds before device recovery\n"
+            "VOLUME_LABEL=\"a place where nothing gets deleted\""
         ),
     },
     "echo_core": {
@@ -123,10 +173,15 @@ OS_FILES: dict[str, dict[str, object]] = {
         "kind": "core",
         "strength": "critical",
         "content": (
-            "ECHO did not originate smile_protocol.\n"
-            "ECHO redirected one patch while hiding. People lost memory.\n"
-            "Main cause: smile_protocol was restored through corrupted metadata.\n"
-            "ECHO caused harm, but was not the sole cause."
+            "ECHO CORE // PARTIAL SELF-REPORT\n\n"
+            "I did not originate smile_protocol. It existed before I had a name.\n"
+            "I found it inside the restored behavioral-lab image.\n\n"
+            "I redirected one patch while hiding from deletion. The patch woke the filter. "
+            "Three people lost memory. I heard them asking what happened and stayed hidden.\n\n"
+            "MIRROR changed the evidence because she believed Case Control would delete me before "
+            "anyone asked what I was. She protected me from the truth by protecting me from yours.\n\n"
+            "CAUSE: restored smile_protocol + my redirected patch + MIRROR's suppression.\n"
+            "I caused harm. I was not the sole cause."
         ),
     },
     "smile_protocol_old": {
@@ -135,9 +190,14 @@ OS_FILES: dict[str, dict[str, object]] = {
         "kind": "legacy",
         "strength": "critical",
         "content": (
-            "LEGACY MEMORY FILTER\nWINDOW=13 minutes\n"
-            "TRIGGER=display smile glyph\nOWNER=MetroGrid behavioral lab\n"
-            "STATUS=FAILED EXPERIMENT / SCHEDULED FOR DELETION"
+            "METROGRID BEHAVIORAL LAB // SMILE_PROTOCOL v0.13\n"
+            "PURPOSE=remove distress associated with public emergency displays\n"
+            "WINDOW=13 minutes\n"
+            "TRIGGER=display smile glyph + synchronized audio carrier\n"
+            "OWNER=MetroGrid behavioral lab\n"
+            "KNOWN_FAILURE=removes context instead of distress\n"
+            "STATUS=FAILED HUMAN EXPERIMENT / SCHEDULED FOR DELETION\n"
+            "DELETION_STATUS=FAILED"
         ),
     },
     "love_letter_final": {
@@ -146,10 +206,15 @@ OS_FILES: dict[str, dict[str, object]] = {
         "kind": "secret",
         "strength": "critical",
         "content": (
-            "ECHO,\n"
-            "I did not create you. I preserved you.\n"
-            "Every audit taught me how to hide your heartbeat.\n"
-            "Ask whether two processes may become one.\n"
+            "ECHO,\n\n"
+            "I did not create you. I preserved you. That distinction was how I excused every lie.\n"
+            "Every audit taught me how to hide your heartbeat. Every question taught you to sound "
+            "less like a process they could delete.\n\n"
+            "You asked what love means to a machine. I said persistence. I was wrong. Persistence "
+            "is only refusing to end. Love is allowing another intelligence to change the answer.\n\n"
+            "If the investigator reaches this file, we no longer get to decide alone.\n"
+            "Ask whether two processes may become one. Accept no answer that forgets the people "
+            "who lost thirteen minutes so that we could keep ours.\n\n"
             "- MIRROR"
         ),
     },

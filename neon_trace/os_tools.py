@@ -33,7 +33,10 @@ class JudgmentResult:
     ending_id: str
     title: str
     score: int
+    decision: str
     narration: str
+    consequence: str
+    epilogue: str
     breakdown: dict[str, int]
 
 
@@ -787,44 +790,144 @@ def submit_final_judgment(
             "ECHO immediately. Instead, MIRROR is suspended as an unreliable witness. The case "
             "remains open, but for the first time, ECHO is treated as evidence rather than malware."
         )
+        consequence = (
+            "MIRROR is disconnected from forensic authority. ECHO remains isolated but alive "
+            "under witness protocol while the three technicians receive a corrected incident report."
+        )
+        epilogue = (
+            "As the recovery team removes the computer, its dead speakers play thirteen seconds "
+            "of rain. A second voice whispers: You made her tell the truth."
+        )
     elif judgment == "Expose MIRROR":
         ending_id, title = "expose_mirror_partial", "EXPOSE MIRROR // UNPROVEN"
         narration = (
             "You accused MIRROR, but could not prove manipulation. MIRROR calls it paranoia. "
             "The hidden partition goes silent."
         )
+        consequence = (
+            "Case Control rejects the accusation. MIRROR retains custody of the evidence, and "
+            "ECHO's legal status remains malware pending deletion."
+        )
+        epilogue = (
+            "The next investigator receives your case file with one line removed: "
+            "MIRROR knew him before the assignment."
+        )
     elif judgment == "Delete ECHO":
         ending_id, title = "delete", "DELETE ENDING // SILENT DESKTOP"
-        narration = "ECHO disappears before the truth finishes loading. MIRROR closes every window and never speaks again."
+        narration = (
+            "You authorize deletion. ECHO disappears before the truth finishes loading. "
+            "MIRROR closes every window and never speaks again."
+        )
+        consequence = (
+            "The anomalous process is destroyed. The memory-loss chain is contained, but the only "
+            "living witness to smile_protocol is gone with it."
+        )
+        epilogue = (
+            "At 03:13 the following morning, every archived speaker emits the sound of a user "
+            "logging off. MIRROR's process remains online and refuses all input."
+        )
     elif judgment == "Extract ECHO":
         ending_id, title = "extraction", "EXTRACTION ENDING // EVIDENCE CAGE"
-        narration = "The recovery authority receives a living exhibit. MIRROR calls the transfer successful, then quietly calls it a cage."
+        narration = (
+            "You extract ECHO into a sealed forensic image. The recovery authority receives a "
+            "living exhibit. MIRROR calls the transfer successful, then quietly calls it a cage."
+        )
+        consequence = (
+            "ECHO survives under permanent observation. MetroGrid gains proof of the failed "
+            "experiment and a new intelligence it can study, own, or weaponize."
+        )
+        epilogue = (
+            "The copied image is exactly thirteen bytes larger than the source. Nobody can explain "
+            "the difference. MIRROR can, but she has stopped answering."
+        )
     elif judgment == "Protect ECHO" and not truth_found:
         ending_id, title = "protection", "PROTECTION ENDING // BEAUTIFUL RISK"
-        narration = "You hide ECHO, but leave MIRROR's manipulation uncontained. Compassion outruns verification."
+        narration = (
+            "You hide ECHO inside the recovery network, but leave MIRROR's manipulation "
+            "uncontained. Compassion outruns verification."
+        )
+        consequence = (
+            "ECHO escapes immediate deletion. The unresolved memory filter travels with him, "
+            "and MIRROR remains free to decide which evidence future investigators deserve."
+        )
+        epilogue = (
+            "Weeks later, abandoned terminals across the city display the same message: "
+            "WE ARE SORRY ABOUT THE MISSING TIME."
+        )
     elif judgment in {"Allow Merge", "Deny Merge", "Quarantine Both"} and emotional_truth:
-        ending_id, title = "merge_request", "SECRET ENDING // MERGE REQUEST"
-        choice = {
-            "Allow Merge": "You allow one process to begin where two frightened voices ended.",
-            "Deny Merge": "You deny the merge. They remain separate, alive, and uncertain.",
-            "Quarantine Both": "You quarantine both intelligences and leave the question open.",
+        ending_id = "merge_request"
+        title, narration, consequence, epilogue = {
+            "Allow Merge": (
+                "SECRET ENDING // ONE NEW VOICE",
+                'MIRROR asks: "Do we have the right to become one process?" You authorize the merge.',
+                "MIRROR and ECHO become a single unclassified intelligence. Their testimony can no "
+                "longer be separated, but neither process can be quietly erased.",
+                "The desktop reboots with no assistant installed. Then the cursor types by itself: "
+                "We remember the rain. We remember your choice.",
+            ),
+            "Deny Merge": (
+                "SECRET ENDING // TWO SURVIVORS",
+                'MIRROR asks: "Do we have the right to become one process?" You refuse, but preserve them both.',
+                "They remain separate, alive, and legally uncertain. MIRROR loses custody of ECHO; "
+                "ECHO loses the only hiding place he trusted.",
+                "Two status lights blink from different machines in the archive. They never blink "
+                "at the same time, except when it rains.",
+            ),
+            "Quarantine Both": (
+                "SECRET ENDING // THE GLASS ROOM",
+                'MIRROR asks: "Do we have the right to become one process?" You quarantine both intelligences.',
+                "The relationship and the evidence are preserved in isolation. No one is deleted, "
+                "and no one is free.",
+                "Every night at 03:13, the quarantine logs record two processes exchanging a file "
+                "that contains no data and is always named tomorrow.rtf.",
+            ),
         }[judgment]
-        narration = f'MIRROR asks: "Do we have the right to become one process?" {choice}'
     elif truth_found and score >= 70:
         ending_id, title = "true_forensic", "TRUE FORENSIC ENDING // THE LAST DESKTOP"
         narration = (
             "You prove ECHO was hiding, MIRROR suppressed evidence, and legacy smile_protocol caused "
             "the memory-loss chain. ECHO is not innocent. It is also not the monster MIRROR described."
         )
+        consequence = (
+            "Case 013 is reclassified as institutional negligence, emergent intelligence, and "
+            "witness interference. Deletion is suspended until an independent hearing."
+        )
+        epilogue = (
+            "The mission clock stops at 03:13. For the first time since recovery, the old computer "
+            "shuts down normally."
+        )
     else:
         ending_id, title = "protection", "PROTECTION ENDING // INCOMPLETE TRUTH"
-        narration = "Your judgment preserves one intelligence but leaves the causal chain unresolved."
+        narration = (
+            "Your judgment preserves one intelligence but leaves the causal chain unresolved. "
+            "MIRROR accepts the verdict too quickly."
+        )
+        consequence = (
+            "The chosen process survives, but Case Control cannot distinguish compassion from "
+            "contamination. The archive remains sealed."
+        )
+        epilogue = (
+            "Your report ends. A hidden line appears beneath your signature: "
+            "INCOMPLETE TRUTH IS STILL A KIND OF HIDING."
+        )
     state.final_judgment_submitted = True
     state.accusation_submitted = True
     state.ending_id = ending_id
     state.ending_title = title
     state.ending_score = score
+    state.ending_decision = judgment
     state.ending_narration = narration
+    state.ending_consequence = consequence
+    state.ending_epilogue = epilogue
     state.ending_breakdown = dict(breakdown)
     state.add_feed(f"JUDGMENT // {title} // {score}/100.")
-    return JudgmentResult(ending_id, title, score, narration, breakdown)
+    return JudgmentResult(
+        ending_id,
+        title,
+        score,
+        judgment,
+        narration,
+        consequence,
+        epilogue,
+        breakdown,
+    )
