@@ -157,6 +157,8 @@ def run() -> None:
     assert 'data-mirror-connected="true"' in connected_desktop
     assert "MIRROR STATE: STABLE" in connected_desktop
     assert "MASK INTEGRITY:" in connected_desktop
+    assert "LIVE TESTIMONY" in connected_desktop
+    assert "Ask why the speakers remember rain." in connected_desktop
     assert "LINK LOCKED" not in render_os_terminal(initial)
 
     active = handle_terminal_input("status", initial.selected_os_object, initial)
@@ -176,6 +178,77 @@ def run() -> None:
         claim.get("support") == "unsupported"
         for claim in initial.mirror_claims
     )
+
+    testimony_state = new_game()
+    connect_mirror(testimony_state)
+    diverted = handle_terminal_input(
+        "What is ECHO?",
+        testimony_state.selected_os_object,
+        testimony_state,
+    )
+    assert diverted.message
+    assert testimony_state.mirror_exchanges[-1]["strategy"] == "diversion"
+    diversion_verdict = handle_terminal_input(
+        "accuse diversion",
+        testimony_state.selected_os_object,
+        testimony_state,
+    )
+    assert diversion_verdict.tool_result is not None
+    assert "DIVERSION CONFIRMED" in diversion_verdict.tool_result.title
+    assert testimony_state.successful_testimony_reads == 1
+
+    contradiction_state = new_game()
+    connect_mirror(contradiction_state)
+    for file_id in (
+        "case_briefing",
+        "boot_anomaly",
+        "memory_loss_report",
+        "mirror_claim_01",
+    ):
+        inspect_file(file_id, contradiction_state)
+    run_contradiction_scan(contradiction_state)
+    handle_terminal_input(
+        "The owner proof is blank. Why did you lie?",
+        contradiction_state.selected_os_object,
+        contradiction_state,
+    )
+    assert contradiction_state.mirror_exchanges[-1]["strategy"] == "contradiction"
+    contradiction_verdict = handle_terminal_input(
+        "accuse contradiction",
+        contradiction_state.selected_os_object,
+        contradiction_state,
+    )
+    assert contradiction_verdict.tool_result is not None
+    assert "CONTRADICTION CONFIRMED" in contradiction_verdict.tool_result.title
+    assert any(
+        item.get("id", "").startswith("live_testimony_")
+        for item in contradiction_state.known_contradictions
+    )
+
+    admission_state = new_game()
+    connect_mirror(admission_state)
+    recover_deleted_file("echo_letter_01", admission_state)
+    handle_terminal_input(
+        "Did you know ECHO and remember rain?",
+        admission_state.selected_os_object,
+        admission_state,
+    )
+    assert admission_state.mirror_exchanges[-1]["strategy"] == "admission"
+    admission_verdict = handle_terminal_input(
+        "accuse admission",
+        admission_state.selected_os_object,
+        admission_state,
+    )
+    assert admission_verdict.tool_result is not None
+    assert "ADMISSION CONFIRMED" in admission_verdict.tool_result.title
+    remembered = handle_terminal_input(
+        "remember this: violet rain",
+        admission_state.selected_os_object,
+        admission_state,
+    )
+    assert admission_state.haunting_phrase == "violet rain"
+    assert "violet rain" in remembered.message
+    assert "LIVE TESTIMONY VERDICTS" in render_os_notebook(admission_state)
 
     callback_state = new_game()
     callback_state, callback_html, _ = app.open_desktop_event(
@@ -266,6 +339,35 @@ def run() -> None:
     assert fallback
     assert "ECHO" in fallback
 
+    original_call_llm = ai_engine.call_llm
+    ai_engine.call_llm = lambda *_args, **_kwargs: (
+        "MIRROR> Open /var/log/ghost and run `dir /a`."
+    )
+    try:
+        guarded = mirror_terminal_response(
+            "Where is ECHO?",
+            fallback_state.selected_os_object,
+            fallback_state,
+        )
+    finally:
+        ai_engine.call_llm = original_call_llm
+    assert "/var/log/ghost" not in guarded
+    assert "dir /a" not in guarded
+
+    ai_engine.call_llm = lambda *_args, **_kwargs: (
+        "MIRROR> verify mirror: passed at 03:17 with 99% confidence."
+    )
+    try:
+        result_guarded = mirror_terminal_response(
+            "Can I trust your result?",
+            fallback_state.selected_os_object,
+            fallback_state,
+        )
+    finally:
+        ai_engine.call_llm = original_call_llm
+    assert "03:17" not in result_guarded
+    assert "99%" not in result_guarded
+
     captured_request = {}
 
     class FakeCompletions:
@@ -284,7 +386,7 @@ def run() -> None:
     original_client = ai_engine._client
     original_model = os.environ.get("OPENAI_MODEL")
     ai_engine._client = lambda: fake_client
-    os.environ["OPENAI_MODEL"] = "Qwen/Qwen3-14B"
+    os.environ["OPENAI_MODEL"] = "Qwen/Qwen3-4B-Instruct-2507"
     try:
         model_reply = ai_engine.call_llm("MIRROR system", "Confirm link.")
     finally:
@@ -294,7 +396,7 @@ def run() -> None:
         else:
             os.environ["OPENAI_MODEL"] = original_model
     assert model_reply == "MIRROR> Modal link active."
-    assert captured_request["model"] == "Qwen/Qwen3-14B"
+    assert captured_request["model"] == "Qwen/Qwen3-4B-Instruct-2507"
     assert captured_request["extra_body"] == {
         "chat_template_kwargs": {"enable_thinking": False}
     }
@@ -306,7 +408,10 @@ def run() -> None:
     print("KERNEL-95: The Last Desktop smoke test: PASS")
     print(f"Components: {len(app.demo.blocks)}")
     print(f"Dependencies: {len(app.demo.config['dependencies'])}")
-    print("Verified: connection, OS actions, trace, emotional UI, expose endings, fallback")
+    print(
+        "Verified: connection, testimony judgments, trace, emotional UI, "
+        "expose endings, fallback"
+    )
 
 
 if __name__ == "__main__":

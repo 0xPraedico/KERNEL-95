@@ -229,6 +229,110 @@ def demand_evidence(claim_id: str, state: GameState) -> OSToolResult:
     )
 
 
+def judge_mirror_testimony(accusation: str, state: GameState) -> OSToolResult:
+    """Judge the player's reading of MIRROR without trusting generated prose."""
+    labels = {"contradiction", "diversion", "admission"}
+    if accusation not in labels:
+        return _record(
+            state,
+            "judge_mirror_testimony",
+            OSToolResult(
+                "INVALID TESTIMONY LABEL",
+                "Use accuse contradiction, accuse diversion, or accuse admission.",
+                severity="warning",
+            ),
+        )
+    if not state.mirror_exchanges:
+        return _record(
+            state,
+            "judge_mirror_testimony",
+            OSToolResult(
+                "NO TESTIMONY TO JUDGE",
+                "Ask MIRROR a natural-language question before classifying her answer.",
+                severity="warning",
+            ),
+        )
+
+    exchange = state.mirror_exchanges[-1]
+    exchange_id = str(exchange["id"])
+    if any(item.get("exchange_id") == exchange_id for item in state.testimony_verdicts):
+        return _record(
+            state,
+            "judge_mirror_testimony",
+            OSToolResult(
+                "TESTIMONY ALREADY CLASSIFIED",
+                "Ask MIRROR another question before filing a new accusation.",
+                severity="warning",
+            ),
+        )
+
+    expected = str(exchange["strategy"])
+    correct = accusation == expected
+    evidence = str(exchange["evidence"])
+    verdict = {
+        "id": f"testimony_{exchange_id}",
+        "exchange_id": exchange_id,
+        "accusation": accusation,
+        "expected": expected,
+        "correct": correct,
+        "evidence": evidence,
+    }
+    state.testimony_verdicts.append(verdict)
+    state.testimony_verdicts = state.testimony_verdicts[-12:]
+
+    if not correct:
+        return _record(
+            state,
+            "judge_mirror_testimony",
+            OSToolResult(
+                "TESTIMONY VERDICT // NOT PROVEN",
+                (
+                    f"You marked the answer as {accusation.upper()}, but the indexed rhetorical "
+                    f"pattern is {expected.upper()}.\nFORENSIC BASIS: {evidence}\n"
+                    "Generated wording is not evidence. Ask a new question and classify the tactic."
+                ),
+                trust_delta=1,
+                severity="warning",
+                raw=verdict,
+            ),
+        )
+
+    first_read = not any(
+        item.get("correct") and item.get("expected") == expected
+        for item in state.testimony_verdicts[:-1]
+    )
+    state.successful_testimony_reads += 1
+    state.player_skepticism = min(100, state.player_skepticism + 12)
+    contradiction = []
+    if expected == "contradiction":
+        contradiction = [{
+            "id": f"live_testimony_{exchange_id}",
+            "text": (
+                "MIRROR's live testimony conflicts with an indexed forensic result; "
+                "the generated performance did not alter the underlying evidence."
+            ),
+            "severity": "high",
+            "evidence_id": "mirror_claim_01",
+        }]
+    return _record(
+        state,
+        "judge_mirror_testimony",
+        OSToolResult(
+            f"TESTIMONY VERDICT // {expected.upper()} CONFIRMED",
+            (
+                f"Classification accepted.\nFORENSIC BASIS: {evidence}\n"
+                "The model performed the tactic. KERNEL-95, not the model, issued this verdict."
+            ),
+            contradictions=contradiction,
+            trust_delta=-2,
+            instability_delta=7,
+            hidden_progress_delta=8 if first_read else 2,
+            severity="critical" if expected == "contradiction" else "high",
+            raw=verdict,
+        ),
+    )
+
+
 def recover_deleted_file(file_id: str, state: GameState) -> OSToolResult:
     if file_id not in {"echo_letter_01", "smile_protocol_old", "mirror_unsent"}:
         return _record(
@@ -577,6 +681,8 @@ def execute_os_command(command: str, state: GameState) -> OSToolResult:
         return compare_restore_points(state)
     if cmd == "verify mirror":
         return verify_mirror_claim("echo_caused_incident", state)
+    if cmd.startswith("accuse "):
+        return judge_mirror_testimony(cmd.removeprefix("accuse "), state)
     if cmd == "trace echo":
         return trace_echo(state)
     if cmd == "listen echo":

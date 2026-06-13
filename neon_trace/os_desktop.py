@@ -424,6 +424,12 @@ def _inline_meter(label: str, value: int, css_class: str) -> str:
 def _terminal_panel(state: GameState) -> str:
     history = render_os_terminal(state)
     emotional_state = get_mirror_emotional_state(state)
+    latest_exchange = state.mirror_exchanges[-1] if state.mirror_exchanges else None
+    latest_exchange_id = str(latest_exchange["id"]) if latest_exchange else ""
+    can_judge = bool(latest_exchange) and not any(
+        str(item.get("exchange_id")) == latest_exchange_id
+        for item in state.testimony_verdicts
+    )
     metrics = "".join(
         [
             _inline_meter("TRUST", state.trust, "trust"),
@@ -446,10 +452,31 @@ def _terminal_panel(state: GameState) -> str:
         ("AUDIT", "audit"),
         ("UNLOCK", "unlock"),
     ]
-    disabled = " disabled" if not state.mirror_connected else ""
-    buttons = "".join(
-        f'<button type="button" data-os-event="action:{action}"{disabled}>{label}</button>'
+    connection_disabled = " disabled" if not state.mirror_connected else ""
+    utility_buttons = "".join(
+        f'<button type="button" data-os-event="action:{action}"{connection_disabled}>{label}</button>'
         for label, action in actions
+    )
+    testimony_disabled = "" if state.mirror_connected and can_judge else " disabled"
+    testimony_buttons = "".join(
+        '<button type="button" class="k95-testimony-action" '
+        f'data-os-event="action:accuse_{label}"{testimony_disabled}>'
+        f"{display}</button>"
+        for label, display in (
+            ("contradiction", "CONTRADICTION"),
+            ("diversion", "DIVERSION"),
+            ("admission", "ADMISSION"),
+        )
+    )
+    testimony_hint = (
+        "CLASSIFY MIRROR'S LAST ANSWER"
+        if can_judge
+        else "ASK MIRROR A NEW QUESTION"
+    )
+    buttons = (
+        '<div class="k95-testimony-guide"><b>LIVE TESTIMONY</b>'
+        f"<span>{testimony_hint}</span></div>"
+        f"{testimony_buttons}{utility_buttons}"
     )
     return f"""
 <section class="k95-terminal-dock">
@@ -472,8 +499,8 @@ def _terminal_panel(state: GameState) -> str:
   <div class="k95-terminal-command">
     <span>MIRROR@REMOTE&gt;</span>
     <input type="text" class="k95-terminal-input" autocomplete="off"
-      placeholder="{"Ask MIRROR or type a command..." if state.mirror_connected else "Connect MIRROR.exe first."}"{disabled}>
-    <button type="button" class="k95-terminal-send"{disabled}>EXECUTE</button>
+      placeholder="{"Ask MIRROR or type a command..." if state.mirror_connected else "Connect MIRROR.exe first."}"{connection_disabled}>
+    <button type="button" class="k95-terminal-send"{connection_disabled}>EXECUTE</button>
   </div>
 </section>
 """
@@ -549,6 +576,10 @@ def render_os_desktop(state: GameState) -> str:
                 and "echo" in str(item.get("content", "")).lower()
                 for item in state.conversation_memory
             )),
+            (
+                "Classify MIRROR testimony",
+                state.successful_testimony_reads >= 1,
+            ),
             ("Recover ECHO letter", "echo_letter_01" in state.deleted_files_recovered),
             ("Run contradiction_scan", state.contradiction_scans >= 1),
             ("Audit MIRROR", state.mirror_audit_unlocked),
@@ -1053,6 +1084,7 @@ def render_os_objectives(state: GameState) -> str:
             and "echo" in str(item.get("content", "")).lower()
             for item in state.conversation_memory
         )),
+        ("Classify MIRROR testimony", state.successful_testimony_reads >= 1),
         ("Recover ECHO's letter", "echo_letter_01" in state.deleted_files_recovered),
         ("Challenge MIRROR twice", state.challenged_mirror_count >= 2),
         ("Run two scans", state.contradiction_scans >= 2),
@@ -1141,10 +1173,18 @@ def render_os_notebook(state: GameState) -> str:
         f"<li>{html.escape(str(item.get('text', 'Contradiction indexed.')))}</li>"
         for item in state.known_contradictions[-6:]
     ) or "<li>No contradictions indexed.</li>"
+    testimony = "".join(
+        "<li>"
+        f"{'CONFIRMED' if item.get('correct') else 'REJECTED'} // "
+        f"{html.escape(str(item.get('accusation', 'unknown')).upper())}"
+        "</li>"
+        for item in state.testimony_verdicts[-6:]
+    ) or "<li>No live testimony classified.</li>"
     return f"""
 <div class="os-notebook">
   <section><b>DISCOVERED FILES</b><ul>{files}</ul></section>
   <section><b>PROVEN CONTRADICTIONS</b><ul>{contradictions}</ul></section>
+  <section><b>LIVE TESTIMONY VERDICTS</b><ul>{testimony}</ul></section>
 </div>
 """
 

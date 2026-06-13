@@ -1,4 +1,4 @@
-"""Deploy Qwen3-14B on Modal behind an OpenAI-compatible vLLM API."""
+"""Deploy Qwen3-4B on Modal behind an OpenAI-compatible vLLM API."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ import subprocess
 import modal
 
 APP_NAME = "kernel95-qwen3-vllm"
-MODEL_NAME = "Qwen/Qwen3-14B"
+MODEL_NAME = "Qwen/Qwen3-4B-Instruct-2507"
 API_KEY_ENV = "KERNEL95_MODAL_API_KEY"
 VLLM_PORT = 8000
 MINUTES = 60

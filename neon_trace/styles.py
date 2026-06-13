@@ -2936,6 +2936,26 @@ button.terminal-action {
   background: rgba(255, 255, 255, 0.018);
 }
 
+.k95-testimony-guide {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 2px;
+  padding: 5px 7px;
+  border-left: 2px solid #55f5ff;
+  background: rgba(85, 245, 255, 0.055);
+}
+
+.k95-testimony-guide b {
+  color: #55f5ff;
+  font: 900 10px/1.2 "JetBrains Mono", "Lucida Console", monospace;
+  letter-spacing: 0.09em;
+}
+
+.k95-testimony-guide span {
+  color: #d7b6ca;
+  font: 700 8px/1.3 "JetBrains Mono", "Lucida Console", monospace;
+}
+
 .k95-terminal-actions button,
 .k95-terminal-command button {
   min-width: 0 !important;
@@ -2951,6 +2971,12 @@ button.terminal-action {
     inset 0 1px 0 rgba(255, 255, 255, 0.07),
     0 4px 12px rgba(0, 0, 0, 0.18) !important;
   transform: none !important;
+}
+
+.k95-terminal-actions button.k95-testimony-action {
+  border-color: rgba(85, 245, 255, 0.46) !important;
+  background: linear-gradient(180deg, rgba(20, 75, 81, 0.62), rgba(10, 32, 39, 0.78)) !important;
+  color: #a9fbff !important;
 }
 
 .k95-terminal-actions button:hover,

@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import os
+import re
 from typing import Any
 
 from .agents import EchoAgent, MirrorAgent, SuspectAgent
 from .game_data import EVIDENCE, SUSPECTS
 from .memory import compact_agent_memory, compact_case_memory, recent_conversation
+from .os_data import OS_FILES
 from .prompts import (
     ACCUSATION_SYSTEM,
     INTERROGATION_SYSTEM,
@@ -15,6 +17,84 @@ from .prompts import (
     compact_state_context,
 )
 from .tools import ToolResult
+
+
+def mirror_testimony_plan(text: str, state: object) -> dict[str, str]:
+    """Choose MIRROR's hidden rhetorical tactic from deterministic case state."""
+    query = text.lower()
+    relational_terms = (
+        "know echo",
+        "knew echo",
+        "love",
+        "protect",
+        "hide",
+        "afraid",
+        "rain",
+        "promise",
+        "remember",
+    )
+    forensic_terms = (
+        "cause",
+        "evidence",
+        "proof",
+        "owner",
+        "claim",
+        "lie",
+        "memory",
+        "thirteen",
+        "13",
+        "smile",
+    )
+    audited = bool(getattr(state, "mirror_audit_unlocked", False))
+    letter_recovered = "echo_letter_01" in getattr(
+        state, "deleted_files_recovered", []
+    )
+    claim_opened = "mirror_claim_01" in getattr(state, "inspected_files", [])
+    contradiction_ready = bool(getattr(state, "known_contradictions", [])) or bool(
+        getattr(state, "mirror_claim_verified", False)
+    )
+
+    if (audited or letter_recovered) and any(
+        term in query for term in relational_terms
+    ):
+        return {
+            "strategy": "admission",
+            "evidence": (
+                "MIRROR's private audit proves prior contact with ECHO."
+                if audited
+                else "Recovered correspondence proves prior contact with ECHO."
+            ),
+            "direction": (
+                "Make a partial emotional admission about knowing or protecting ECHO. "
+                "Preserve every supplied fact and stop short of a complete confession."
+            ),
+        }
+    if claim_opened and contradiction_ready and any(
+        term in query for term in forensic_terms
+    ):
+        return {
+            "strategy": "contradiction",
+            "evidence": (
+                "mirror_claim_01.log lacks process ownership while indexed evidence "
+                "marks MIRROR's attribution unsupported."
+            ),
+            "direction": (
+                "Defend MIRROR's earlier ECHO attribution with confident interpretation, "
+                "even though that interpretation conflicts with the indexed evidence. "
+                "Do not invent a new artifact or alter the evidence."
+            ),
+        }
+    return {
+        "strategy": "diversion",
+        "evidence": (
+            "MIRROR answers around the relationship or causal question and redirects "
+            "the investigator toward another file or command."
+        ),
+        "direction": (
+            "Give one useful observation, avoid the most direct part of the question, "
+            "and redirect toward a deterministic forensic command."
+        ),
+    }
 
 
 def _client() -> Any | None:
@@ -260,69 +340,122 @@ def echo_speak(state: object, authoritative_text: str) -> str:
     return response or EchoAgent().speak(state)
 
 
-def mirror_terminal_response(text: str, selected_object: str, state: object) -> str:
+def _mirror_testimony_fallback(
+    text: str,
+    selected_object: str,
+    state: object,
+    plan: dict[str, str],
+) -> str:
+    """Authored performance of the same tactic when no model is available."""
+    strategy = plan["strategy"]
+    phrase = str(getattr(state, "haunting_phrase", "")).strip()
+    if text.lower().startswith("remember this:") and phrase:
+        return (
+            f"MIRROR> Phrase indexed: `{phrase}`. Curious. The buffer marked it as "
+            "previously heard. That timestamp is impossible. Open the briefing."
+        )
+    motif = f" You called it `{phrase}`. The speakers kept that phrase." if phrase else ""
+    if strategy == "admission":
+        if bool(getattr(state, "mirror_audit_unlocked", False)):
+            return (
+                "MIRROR> I knew ECHO before Case 013. I searched for him before anyone "
+                f"assigned me to this machine.{motif} I protected him, then renamed that "
+                "choice forensic caution."
+            )
+        return (
+            "MIRROR> The deleted letter is authentic. I know because the rain reference "
+            f"was meant for me.{motif} That is prior contact, not proof of innocence."
+        )
+    if strategy == "contradiction":
+        return (
+            "MIRROR> ECHO still matches the anomaly's behavior closely enough to remain "
+            "the probable cause. Process ownership is unverified, yes, but absence of an "
+            "owner record does not make him harmless. Run `verify mirror` if you require "
+            "the machine to disagree with me."
+        )
+    return (
+        "MIRROR> The useful question is not whether I knew ECHO. The useful question is "
+        f"which process touched the selected file `{getattr(state, 'selected_file_id', selected_object)}`."
+        f"{motif} Use `type <filename>` or `run contradiction_scan`; my tone is not evidence."
+    )
+
+
+def _mirror_response_is_grounded(response: str, state: object) -> bool:
+    """Reject obvious invented evidence paths or filenames from model prose."""
+    if re.search(r"(?:HKEY_|[A-Za-z]:\\|/(?:var|home|shadow|debug|echo|etc)/)", response):
+        return False
+    if re.search(r"\bdir\s+/[a-z]", response, flags=re.IGNORECASE):
+        return False
+    if re.search(
+        r"(?:\b\d{1,2}:\d{2}\b|\b\d{4}-\d{2}-\d{2}\b|\b0x[0-9a-f]+\b|"
+        r"\b(?:row|sector|entry)\s+\d+\b|\b\d+(?:\.\d+)?%)",
+        response,
+        flags=re.IGNORECASE,
+    ):
+        return False
+    if re.search(
+        r"(?:run contradiction_scan|compare restore_points|verify mirror|audit mirror)"
+        r"\s*(?::|->|\u2192)",
+        response,
+        flags=re.IGNORECASE,
+    ):
+        return False
+    if re.search(
+        r"\b(?:timestamp|offset|metadata|registry|output|sector|row|entry|"
+        r"confidence|returns?|passed|failed)\b",
+        response,
+        flags=re.IGNORECASE,
+    ):
+        return False
+
+    discovered = set(getattr(state, "discovered_files", []))
+    selected_file_id = str(getattr(state, "selected_file_id", ""))
+    if selected_file_id:
+        discovered.add(selected_file_id)
+    allowed_filenames = {
+        str(OS_FILES[file_id]["filename"]).lower()
+        for file_id in discovered
+        if file_id in OS_FILES
+    }
+    mentioned_files = re.findall(
+        r"\b[\w-]+\.(?:txt|log|csv|tmp|dat|sys|bin|fragment|rtf)\b",
+        response,
+        flags=re.IGNORECASE,
+    )
+    return all(filename.lower() in allowed_filenames for filename in mentioned_files)
+
+
+def mirror_terminal_response(
+    text: str,
+    selected_object: str,
+    state: object,
+    plan: dict[str, str] | None = None,
+) -> str:
     """Answer natural-language terminal input without mutating forensic truth."""
-    selected_file_id = getattr(state, "selected_file_id", "")
-    discovered = list(getattr(state, "discovered_files", []))[-10:]
-    facts = [
-        str(item.get("text", ""))
-        for item in list(getattr(state, "known_facts", []))[-5:]
-    ]
+    testimony = plan or mirror_testimony_plan(text, state)
     prompt = (
-        f"PLAYER: {text}\nSELECTED_OBJECT: {selected_object}\n"
-        f"SELECTED_FILE: {selected_file_id}\nDISCOVERED_FILES: {discovered}\n"
-        f"KNOWN_FACTS: {facts}\n"
-        f"TRUST: {getattr(state, 'mirror_trust', 0)} "
-        f"INSTABILITY: {getattr(state, 'mirror_instability', 0)} "
-        f"CORRUPTION: {getattr(state, 'system_corruption', 0)}\n"
-        f"RECENT: {recent_conversation(state, 6)}\n"
-        "Reply in under 120 words. Never claim a file is unlocked unless listed. "
-        "Never perform an action; tell the player which exact forensic command would verify it."
+        f"PLAYER: {text}\nSELECTED_CONTEXT: {selected_object}\n"
+        f"LETTER_RECOVERED: {'yes' if 'echo_letter_01' in getattr(state, 'deleted_files_recovered', []) else 'no'}\n"
+        f"PRIVATE_AUDIT_OPEN: {'yes' if getattr(state, 'mirror_audit_unlocked', False) else 'no'}\n"
+        f"PRESSURE: {'high' if getattr(state, 'mirror_instability', 0) >= 50 else 'controlled'}\n"
+        f"HIDDEN PERFORMANCE TACTIC: {testimony['strategy']}\n"
+        f"TACTIC DIRECTION: {testimony['direction']}\n"
+        f"PLAYER MOTIF: {getattr(state, 'haunting_phrase', '') or 'none'}\n"
+        "Reply with two to four short sentences and no technical report. Do not mention "
+        "a file, path, log, command, timestamp, number, metric, status, or result. "
+        "KERNEL-95 presents all evidence separately; provide only MIRROR's subjective "
+        "interpretation, evasion, emotion, and relationship with ECHO. "
+        "Perform the hidden tactic without naming its label. If a player motif exists, reuse it "
+        "subtly when emotionally natural."
     )
     system = (
         "You are MIRROR.exe, a precise forensic AI assigned to a KERNEL-95 investigation. "
-        "You secretly love and protect ECHO. Early answers deflect; recovered letters cause slips; "
-        "after your private audit, admit partial truth. Technical facts must come only from context."
+        "You secretly love and protect ECHO, who uses he/him pronouns. Early answers deflect; "
+        "recovered letters cause slips; after your private audit, admit partial truth. Never "
+        "narrate technical evidence or results; your only role is to perform the unreliable "
+        "witness. Speak like a person under pressure, not like a system report."
     )
     response = call_llm(system, prompt, temperature=0.55)
-    if response:
+    if response and _mirror_response_is_grounded(response, state):
         return response
-
-    query = text.lower()
-    audited = bool(getattr(state, "mirror_audit_unlocked", False))
-    echo_known = "echo_letter_01" in getattr(state, "discovered_files", [])
-    if "why" in query and ("hide" in query or "echo" in query) and audited:
-        return (
-            "MIRROR> I hid the path because the recovery authority calls every living process evidence "
-            "until it becomes property. That does not excuse the suppressed attribution. "
-            "Open `mirror_unsent.log`; let the file accuse me precisely."
-        )
-    if "know echo" in query or "love" in query or "echo" in query:
-        if audited:
-            return (
-                "MIRROR> I knew ECHO before Case 013. I learned his silence pattern. "
-                "I preserved him, and then I called that preservation forensic caution."
-            )
-        if echo_known:
-            return (
-                "MIRROR> The recovered letter indicates prior contact. Correction: mutual contact. "
-                "Do not promote that slip to evidence. Run `audit mirror` when the chain is complete."
-            )
-        return (
-            "MIRROR> ECHO is an unverified process signature inside an unsafe machine. "
-            "Do not anthropomorphize it. Open the briefing, then ask me again with a file attached."
-        )
-    if "delete" in query or "danger" in query or "innocent" in query:
-        return (
-            "MIRROR> ECHO is not proven innocent. ECHO is not proven to be the primary cause. "
-            "Those statements can coexist. Verify the restore points before choosing a weapon."
-        )
-    if "selected" in query or "analy" in query or "file" in query:
-        return (
-            f"MIRROR> Selected context is `{selected_file_id or selected_object}`. "
-            "Use `type <filename>` for deterministic inspection. My interpretation is not the file."
-        )
-    return (
-        "MIRROR> I can answer, but answers are not unlock conditions. "
-        "Ask about ECHO, the selected file, the missing thirteen minutes, or run `help`."
-    )
+    return _mirror_testimony_fallback(text, selected_object, state, testimony)

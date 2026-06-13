@@ -107,7 +107,7 @@ evidence, change unlocks, or select an ending.
 ## Modal vLLM backend
 
 The Hugging Face Space runs the KERNEL-95 game UI. Modal runs
-`Qwen/Qwen3-14B` behind vLLM's OpenAI-compatible API. The model only supplies
+`Qwen/Qwen3-4B-Instruct-2507` behind vLLM's OpenAI-compatible API. The model only supplies
 MIRROR/ECHO voice; deterministic tools remain authoritative and model output
 cannot mutate `GameState`.
 
@@ -147,7 +147,7 @@ Set these Hugging Face Space secrets:
 ```text
 OPENAI_API_KEY=<same api key used by Modal>
 OPENAI_BASE_URL=https://<modal-endpoint>/v1
-OPENAI_MODEL=Qwen/Qwen3-14B
+OPENAI_MODEL=Qwen/Qwen3-4B-Instruct-2507
 ```
 
 Test the deployed endpoint with the same variables in your local shell:
@@ -161,6 +161,42 @@ and scales to zero after five idle minutes. A cold request may therefore take
 longer while the container starts. If Modal fails, times out, or is asleep,
 KERNEL-95 falls back to deterministic authored responses and remains fully
 playable without `OPENAI_API_KEY`.
+
+### Why the AI is load-bearing
+
+MIRROR is the unreliable witness; KERNEL-95 is the truth engine. For every
+free-form question, deterministic case state secretly selects one performance
+tactic: contradiction, diversion, or admission. Qwen performs that tactic using
+the player's wording and recurring motifs. The player then classifies the
+answer, and deterministic evidence decides whether the accusation is correct.
+
+The model never receives authority to create evidence, unlock files, mutate
+`GameState`, or choose an ending. It also does not narrate technical results.
+Responses containing invented paths, filenames, timestamps, metrics, or command
+results are discarded and replaced by the authored fallback.
+
+### Model evaluation
+
+`modal_voice_eval.py` runs the same 20 MIRROR prompts against a deployed model.
+The 14B baseline had a roughly 106-second cold start and generally took 2-5
+seconds warm. The 4B deployment had a roughly 97-second first cold start and
+generally answered in 0.6-1.6 seconds warm.
+
+Both models invented technical details when asked to act as forensic reporters.
+The final design therefore narrows the model's job to subjective roleplay while
+the deterministic UI owns every fact. Under that voice-only protocol,
+`Qwen/Qwen3-4B-Instruct-2507` retained the eerie MIRROR performance with much
+lower warm latency, so it is the selected model.
+
+Run the repeatable 20-dialogue MIRROR voice suite without copying the API key
+out of the Modal secret:
+
+```bash
+modal run modal_voice_eval.py \
+  --base-url https://<modal-endpoint> \
+  --model Qwen/Qwen3-4B-Instruct-2507 \
+  --output mirror_voice_eval_4b.json
+```
 
 ## Optional Debug Easter Eggs
 

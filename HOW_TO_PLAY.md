@@ -38,7 +38,39 @@ MIRROR, what is ECHO?
 MIRROR's dialogue is interpretation, not proof. Use files and tools to verify
 her claims.
 
-### 4. Recover Deleted Evidence
+### 4. Classify MIRROR's Testimony
+
+After each free-form answer, classify MIRROR's tactic with one of the cyan
+buttons:
+
+- **CONTRADICTION**: her answer conflicts with indexed evidence.
+- **DIVERSION**: she avoids the central question and redirects you.
+- **ADMISSION**: she reveals part of her prior relationship with ECHO.
+
+KERNEL-95 judges the accusation against deterministic case facts. The model
+performs the unreliable witness, but it cannot decide whether your accusation
+is correct.
+
+Try:
+
+```text
+Did you know ECHO before Case 013?
+accuse diversion
+```
+
+Recover more evidence and ask the same question again. MIRROR's evasion strategy
+can change when the machine knows more.
+
+For the haunted-computer motif, teach the machine a phrase:
+
+```text
+remember this: violet rain
+```
+
+MIRROR may reuse it later, while ECHO insists the phrase was already present
+before this boot.
+
+### 5. Recover Deleted Evidence
 
 Open **Recycle Bin** and recover `echo_letter_01.tmp`.
 
@@ -48,7 +80,7 @@ You can also use:
 recover echo_letter_01.tmp
 ```
 
-### 5. Pressure MIRROR
+### 6. Pressure MIRROR
 
 Open **Control Panel** or use the terminal action buttons:
 
@@ -59,7 +91,7 @@ Open **Control Panel** or use the terminal action buttons:
 
 Challenge MIRROR twice and run two contradiction scans.
 
-### 6. Verify the Timeline
+### 7. Verify the Timeline
 
 Open **System Restore**, inspect both readable restore points, then run:
 
@@ -73,7 +105,7 @@ Alternatively, inspect `mirror_claim_01.log` and run:
 verify mirror
 ```
 
-### 7. Audit MIRROR
+### 8. Audit MIRROR
 
 After two challenges, two scans, the deleted ECHO letter, and verified restore
 evidence, run:
@@ -84,7 +116,7 @@ audit mirror
 
 This recovers MIRROR's private log.
 
-### 8. Mount HIDDEN
+### 9. Mount HIDDEN
 
 Run:
 
@@ -95,7 +127,7 @@ unlock hidden_partition
 Open **HIDDEN:** and inspect `echo_core.fragment` and
 `love_letter_final.rtf`.
 
-### 9. Contact ECHO
+### 10. Contact ECHO
 
 Use:
 
@@ -107,7 +139,7 @@ listen echo
 `trace echo` always returns a meaningful result. Early in the case it explains
 which evidence is missing; later it locates or contacts ECHO.
 
-### 10. Submit Judgment
+### 11. Submit Judgment
 
 Open **Final Judgment**. Explain:
 
@@ -136,6 +168,9 @@ type CASE_013_BRIEFING.txt
 recover echo_letter_01.tmp
 scan memory
 run contradiction_scan
+accuse contradiction
+accuse diversion
+accuse admission
 trace echo
 compare restore_points
 verify mirror
@@ -150,3 +185,19 @@ type echo_core.fragment
 MIRROR can speak persuasively, but only deterministic files and forensic tools
 change the case. If the optional model is unavailable, the complete game still
 works with authored fallback responses.
+
+## Quick AI Test
+
+1. Connect MIRROR and ask `What is ECHO?`; classify the early evasion as
+   **DIVERSION**.
+2. Recover `echo_letter_01.tmp`, then ask
+   `Did you know ECHO and remember rain?`; classify the partial truth as
+   **ADMISSION**.
+3. Open `mirror_claim_01.log`, run `run contradiction_scan`, then ask
+   `The owner proof is blank. Why did you lie?`; classify it as
+   **CONTRADICTION**.
+4. Type `remember this: violet rain`, then continue questioning MIRROR and watch
+   for the phrase to return.
+
+Each accepted verdict should say that the model performed the tactic while
+KERNEL-95 issued the ruling.

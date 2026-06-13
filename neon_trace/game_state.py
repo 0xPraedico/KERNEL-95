@@ -36,6 +36,11 @@ class GameState:
     pinned_theories: list[dict[str, Any]] = field(default_factory=list)
     mirror_claims: list[dict[str, Any]] = field(default_factory=list)
     conversation_memory: list[dict[str, str]] = field(default_factory=list)
+    mirror_exchanges: list[dict[str, Any]] = field(default_factory=list)
+    testimony_verdicts: list[dict[str, Any]] = field(default_factory=list)
+    mirror_exchange_count: int = 0
+    successful_testimony_reads: int = 0
+    haunting_phrase: str = ""
     tool_trace: list[dict[str, Any]] = field(default_factory=list)
     suspect_notes: dict[str, list[str]] = field(default_factory=dict)
     suspect_stress: dict[str, int] = field(default_factory=dict)
@@ -120,6 +125,7 @@ class GameState:
     mirror_claim_verified: bool = False
     restore_points_compared: bool = False
     demand_evidence_used: bool = False
+
     def adjust_trust(self, amount: int) -> None:
         self.trust = max(0, min(100, self.trust + amount))
         self.mirror_trust = self.trust

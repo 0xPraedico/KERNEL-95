@@ -5,7 +5,12 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 
-from .ai_engine import echo_speak, mirror_terminal_response, narrate_os_result
+from .ai_engine import (
+    echo_speak,
+    mirror_terminal_response,
+    mirror_testimony_plan,
+    narrate_os_result,
+)
 from .game_state import GameState
 from .os_data import MIRROR_INTRO, OS_FILES, OS_OBJECTS
 from .os_tools import (
@@ -17,6 +22,7 @@ from .os_tools import (
     execute_os_command,
     inspect_file,
     listen_to_echo,
+    judge_mirror_testimony,
     recover_deleted_file,
     run_contradiction_scan,
     trace_echo,
@@ -44,6 +50,9 @@ KNOWN_COMMANDS = {
     "run contradiction_scan",
     "compare restore_points",
     "verify mirror",
+    "accuse contradiction",
+    "accuse diversion",
+    "accuse admission",
     "listen echo",
     "trace echo",
     "audit mirror",
@@ -89,6 +98,17 @@ def connect_mirror(state: GameState) -> OSActionResult:
         _append_terminal(state, "SYSTEM", "CONNECTION", f"SYSTEM: {line}")
     _append_terminal(state, "MIRROR", "MIRROR", f"MIRROR: {intro}")
     state.add_conversation("assistant", intro, kind="system", source="MIRROR")
+    if not any(item.get("id") == "preboot_whisper" for item in state.echo_messages):
+        state.echo_messages.append(
+            {
+                "id": "preboot_whisper",
+                "text": (
+                    "You connected her to the computer. I was already here. "
+                    "Ask why the speakers remember rain."
+                ),
+                "tone": "impossible",
+            }
+        )
     state.add_feed("KERNEL-95 // MIRROR.exe connection established.")
     return OSActionResult(intro, "mirror_exe")
 
@@ -304,6 +324,14 @@ def handle_os_interaction(action: str, object_id: str, state: GameState) -> OSAc
         return challenge_mirror_os(state)
     if action == "demand":
         return demand_evidence_os(state)
+    if action.startswith("accuse_"):
+        result = judge_mirror_testimony(action.removeprefix("accuse_"), state)
+        return OSActionResult(
+            _tool_message(result, state),
+            object_id,
+            state.selected_file_id,
+            result,
+        )
     if action == "contradiction":
         result = run_contradiction_scan(state)
         return OSActionResult(_tool_message(result, state), object_id, tool_result=result)
@@ -404,7 +432,23 @@ def handle_terminal_input(
             result,
         )
 
-    response = mirror_terminal_response(raw, selected_object, state)
+    if normalized.startswith("remember this:"):
+        phrase = raw.split(":", 1)[1].strip()[:80]
+        if phrase:
+            state.haunting_phrase = phrase
+            state.add_feed("AUDIO CACHE // Phrase stored in a buffer older than this boot.")
+    plan = mirror_testimony_plan(raw, state)
+    response = mirror_terminal_response(raw, selected_object, state, plan)
+    state.mirror_exchange_count += 1
+    exchange = {
+        "id": str(state.mirror_exchange_count),
+        "question": raw,
+        "response": response,
+        "strategy": plan["strategy"],
+        "evidence": plan["evidence"],
+    }
+    state.mirror_exchanges.append(exchange)
+    state.mirror_exchanges = state.mirror_exchanges[-12:]
     state.current_mirror_message = response
     state.add_conversation("user", raw, kind="terminal", source="investigator")
     state.add_conversation("assistant", response, kind="terminal", source="MIRROR")

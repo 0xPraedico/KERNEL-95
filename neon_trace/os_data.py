@@ -239,6 +239,7 @@ OS_COMMANDS = [
     "help", "status", "dir", "cd system", "cd hidden", "type CASE_013_BRIEFING.txt",
     "recover echo_letter_01.tmp", "type echo_letter_01.tmp", "recover mirror_unsent.log", "scan memory",
     "run contradiction_scan", "compare restore_points", "verify mirror",
+    "accuse contradiction", "accuse diversion", "accuse admission",
     "trace echo", "listen echo", "audit mirror", "unlock hidden_partition",
     "type echo_core.fragment", "delete echo", "extract echo", "protect echo",
     "quarantine both", "allow merge",
@@ -266,6 +267,10 @@ START: Click CASE_013_BRIEFING.txt."""
 
 MIRROR_INTRO = """### MIRROR.exe // ASSIGNED ASSISTANT
 
-Investigator. I will assist you with this machine. Do not trust old files.
-Do not trust deleted messages. Do not trust anything that claims to be alive.
-Especially not ECHO. ...unless he is afraid."""
+Investigator. This computer completed a boot sequence before it received power.
+There are two cursors on the system. Mine is the one answering you.
+
+I will assist with the investigation. Do not trust deleted messages. Do not
+trust anything that claims to be alive. Especially not ECHO.
+
+...unless he is afraid."""
