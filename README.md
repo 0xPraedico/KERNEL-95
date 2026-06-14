@@ -41,6 +41,11 @@ last desktop.
 
 The exact player guide is in [HOW_TO_PLAY.md](HOW_TO_PLAY.md).
 
+## Social Post + Demo Video
+
+Watch the KERNEL-95 demo and read the social post:
+[x.com/praedico/status/2065889011139215517](https://x.com/praedico/status/2065889011139215517)
+
 ## OpenAI Codex Track
 
 Public source repository:
